@@ -1,22 +1,35 @@
 from random import randint, shuffle
 from typing import List, Dict, Tuple, Sequence, NewType
 import copy
+from termcolor import colored
+
 import time
 
 class Animal:
     def __init__(self, x_y: Tuple[int, int]):
         self._position = x_y
-
+        self._alive = True
+        self._speed = randint(1, 10)
 
 class Mouse(Animal):
     ID = 0
 
+    #variables
+    _preg_time = 1
+    _max_age = 10
+
+
     def __init__(self, x_y: Tuple[int, int]):
         super().__init__(x_y)
-        self._alive = True
-        self._time_since_offspring = 0
-        self._ID_string = "M" + str(Mouse.ID)
+        self._ID_string = "M" + str(Mouse.ID).zfill(Environment.empty_field_spaces-1)
+        self._age = 0
+        self._is_pregnant = False
+        self._is_pregnant_with = None
+        self._time_pregnant = 0
         Mouse.ID += 1
+
+    def __str__(self):
+        return colored("M" + str(Mouse.ID).zfill(Environment.empty_field_spaces-1), 'blue')
 
 
 class Owl(Animal):
@@ -24,13 +37,18 @@ class Owl(Animal):
 
     def __init__(self, x_y: Tuple[int, int]):
         super().__init__(x_y)
-        self._ID_string = "O" + str(Owl.ID)
+        self._ID_string = "O" + str(Owl.ID).zfill(Environment.empty_field_spaces-1)
         Owl.ID += 1
+
+    def __str__(self):
+        return colored("O" + str(Owl.ID).zfill(Environment.empty_field_spaces-1), 'red')
 
 
 class Environment:
+    empty_field_spaces = 4
+
     def __init__(self, n, T, p, M, o):
-        self._empty_field = '   '
+        self._empty_field = ' '*4
         self._n = n
         self._mice = []
         self._owls = []
@@ -39,7 +57,7 @@ class Environment:
         self._mice_alive = 0
 
         self._ticks = T
-        self._preg_time = p
+        #self._preg_time = p
         self._start_mice = M
         self._start_owls = o
 
@@ -50,27 +68,15 @@ class Environment:
         self.print_and_tick(self._ticks)
 
     def print(self):
-        string_builder = "   "
-        for i in range(self._n):
-            string_builder += "{:^7}".format(i)
-        string_builder += "\n"
-
-        for i, row in enumerate(self._fields):
-            string_builder += "{:^3}".format(i)
-            string_builder += str(row)
-            string_builder += "\n"
-
-        print(string_builder)
-        ##old
-        """
         print("    ", end='')
         for i in range(self._n):
-            print("{:^7}".format(i), end='')
+            print("{:^6}".format(i), end='')
         print()
         for i, row in enumerate(self._fields):
             print("{:^3}".format(i), end=' ')
-            print(row)
-            """
+            for item in row:
+                print("["+item+"]", end='')
+            print()
 
     def add_animal_at(self, animal: str, x_y: Tuple[int, int]):
         x, y = x_y
@@ -98,8 +104,6 @@ class Environment:
         dir_options = copy.copy(self._dir_options)
         shuffle(dir_options)
 
-        x_y = animal._position
-
         # Recursive function to try one direction at a time.
         def try_dir(dir_options):
             if dir_options == []: #base-case
@@ -107,7 +111,7 @@ class Environment:
             else:
                 chosen_dir = dir_options.pop()
                 candidate_tile = tuple(map(sum, zip(animal._position, chosen_dir)))
-                x_cand,y_cand = candidate_tile
+                x_cand, y_cand = candidate_tile
 
                 if self.is_legal_field(candidate_tile):
 
@@ -155,23 +159,34 @@ class Environment:
     def mice_tick(self):
         mice_copy = copy.copy(self._mice)
 
-        for mouse in mice_copy:
-            if mouse._alive:
+        for mouse in mice_copy:  # loop through copy of mice list.
+            if mouse._alive:  # only do something if mouse is alive.
                 x, y = mouse._position
 
-                if self._fields[y][x][0] == 'O':
+                if self._fields[y][x][0] == 'O':  # if mouse on tile, kill mouse.
                     mouse._alive = False
                     self._mice_alive -= 1
 
-                else:
-                    mouse._time_since_offspring += 1
+                else:  # action for alive mice.
+                    if mouse._is_pregnant:  # add pregnant time.
+                        mouse._time_pregnant += 1
+
+                    mouse_near_x_y = self.get_adj_tile_for(mouse, "withMouse")
+                    if mouse_near_x_y != (-1, -1) and not mouse._is_pregnant:
+                        mouse._is_pregnant = True
+                        x, y = mouse_near_x_y
+                        mouse._is_pregnant_with = self._fields[y][x]
+
 
                     near_x_y = self.get_adj_tile_for(mouse, "randLegal")
 
                     if near_x_y != (-1, -1):
-                        if mouse._time_since_offspring >= self._preg_time:
+                        if mouse._time_pregnant >= Mouse._preg_time:
                             self.add_animal_at("mouse", near_x_y)
-                            mouse._time_since_offspring = 0
+                            mouse._time_pregnant = 0
+                            mouse._is_pregnant = False
+                            mouse._is_pregnant_with = None
+
                         else:
                             self.animal_move_to(mouse, near_x_y)
 
@@ -181,6 +196,9 @@ class Environment:
 
     def print_and_tick(self, no):
         for i in range(0, no):
+            tick_string = "Tick: {}".format(i)
+            print(colored(tick_string,attrs=['underline','bold']))
+
             self.print()
             print("")
             self.tick()
@@ -201,4 +219,3 @@ class Environment:
 
 if __name__ == '__main__':
     environment = Environment(n=10, T=10, p=3, M=10, o=2)
-    print(environment._mice_alive)

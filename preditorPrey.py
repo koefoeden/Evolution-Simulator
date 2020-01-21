@@ -194,4 +194,4 @@ class Environment:
             self.add_animal_at("owl", posibilities[i2])
 
 if __name__ == '__main__':
-    environment = Environment(20, 10, 3, 3, 2)
+    environment = Environment(10, 10, 3, 3, 2)
