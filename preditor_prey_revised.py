@@ -1,32 +1,10 @@
 from random import randint, shuffle
 from typing import List, Dict, Tuple, Sequence, NewType
 import copy
-
+import time
 
 class Animal:
     def __init__(self, x_y: Tuple[int, int]):
-        self._position = x_y
-
-    def get_rand_adj_tile(self, dir_options: List[str]):
-        # Generate random number:
-        ran_num = randint(0, len(dir_options) - 1)
-
-        # Select random diection
-        rand_dir = dir_options[ran_num]
-        x, y = self._position
-
-        chosen_tile = {
-            "up": (x, y - 1),
-            "down": (x, y + 1),
-            "right": (x + 1, y),
-            "left": (x - 1, y),
-        }.get(rand_dir, (-1, -1))
-
-        dir_options.remove(rand_dir)
-
-        return chosen_tile, dir_options
-
-    def move(self, x_y: Tuple[int, int]):
         self._position = x_y
 
 
@@ -51,7 +29,6 @@ class Owl(Animal):
 
 
 class Environment:
-
     def __init__(self, n, T, p, M, o):
         self._empty_field = '   '
         self._n = n
@@ -66,10 +43,26 @@ class Environment:
         self._start_mice = M
         self._start_owls = o
 
+        self._dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+
+        #RUN
         self.add_animals()
         self.print_and_tick(self._ticks)
 
     def print(self):
+        string_builder = "   "
+        for i in range(self._n):
+            string_builder += "{:^7}".format(i)
+        string_builder += "\n"
+
+        for i, row in enumerate(self._fields):
+            string_builder += "{:^3}".format(i)
+            string_builder += str(row)
+            string_builder += "\n"
+
+        print(string_builder)
+        ##old
+        """
         print("    ", end='')
         for i in range(self._n):
             print("{:^7}".format(i), end='')
@@ -77,6 +70,7 @@ class Environment:
         for i, row in enumerate(self._fields):
             print("{:^3}".format(i), end=' ')
             print(row)
+            """
 
     def add_animal_at(self, animal: str, x_y: Tuple[int, int]):
         x, y = x_y
@@ -84,6 +78,7 @@ class Environment:
             new_mouse = Mouse(x_y)
             self._mice.insert(0, new_mouse)
             self._fields[y][x] = "{:3}".format(new_mouse._ID_string)
+            self._mice_alive+=1
 
         if animal == "owl":
             new_owl = Owl(x_y)
@@ -92,37 +87,45 @@ class Environment:
 
     def is_legal_field(self, x_y: Tuple[int, int]):
         x, y = x_y
-        try:
-            return (x >= 0) and (y >= 0) and self._fields[y][x] == self._empty_field
-        except:
-            return False
+        return (x >= 0) and (y >= 0) and (x < self._n) and (y < self._n)
+
+    def is_empty_field(self, x_y: Tuple[int, int]):
+        x, y = x_y
+        return self._fields[y][x]==self._empty_field
 
     def get_adj_tile_for(self, animal: Animal, tile_req: str):
+        # Initialize: Shuffling and copying
+        dir_options = copy.copy(self._dir_options)
+        shuffle(dir_options)
 
-        def internal_rec(dir_options):
-            if dir_options == []:
-                return -1, -1
+        x_y = animal._position
+
+        # Recursive function to try one direction at a time.
+        def try_dir(dir_options):
+            if dir_options == []: #base-case
+                return (-1,-1)
             else:
-                x_y, remain_options = animal.get_rand_adj_tile(dir_options)
-                x, y = x_y
+                chosen_dir = dir_options.pop()
+                candidate_tile = tuple(map(sum, zip(animal._position, chosen_dir)))
+                x_cand,y_cand = candidate_tile
 
-                if tile_req == "randLegal":
-                    if self.is_legal_field(x_y):
-                        return x_y
-                    else:
-                        return internal_rec(remain_options)
+                if self.is_legal_field(candidate_tile):
 
-                elif tile_req == "withMouse":
-                    try:
-                        # add ID
-                        if x >= 0 and y >= 0 and self._fields[y][x][0] == "M":
-                            return x_y
+                    if tile_req == "randLegal":
+                        if self.is_empty_field(candidate_tile):
+                            return candidate_tile
                         else:
-                            return internal_rec(remain_options)
-                    except:
-                        return internal_rec(remain_options)
+                            return try_dir(dir_options)
 
-        return internal_rec(["left", "up", "down", "right"])
+                    elif tile_req == "withMouse":
+                        if self._fields[y_cand][x_cand][0] == "M":
+                            return candidate_tile
+                        else:
+                            return try_dir(dir_options)
+                else:
+                    return try_dir(dir_options)
+
+        return try_dir(dir_options)
 
     def animal_move_to(self, animal, x_y: Tuple[int, int]):
         # Clear field
@@ -158,6 +161,7 @@ class Environment:
 
                 if self._fields[y][x][0] == 'O':
                     mouse._alive = False
+                    self._mice_alive -= 1
 
                 else:
                     mouse._time_since_offspring += 1
@@ -180,6 +184,9 @@ class Environment:
             self.print()
             print("")
             self.tick()
+            #time.sleep(1)
+    #def print_animation(self):
+
 
     def add_animals(self):
         posibilities = [(x, y) for x in range(self._n) for y in range(self._n)]
@@ -193,4 +200,5 @@ class Environment:
 
 
 if __name__ == '__main__':
-    environment = Environment(n=20, T=100, p=3, M=3, o=2)
+    environment = Environment(n=10, T=10, p=3, M=10, o=2)
+    print(environment._mice_alive)
