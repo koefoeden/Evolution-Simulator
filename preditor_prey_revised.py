@@ -13,35 +13,52 @@ class Animal:
 
 class Mouse(Animal):
     ID = 0
+    sex_dict = {0: "male", 1: "female"}
 
-    #variables
-    _preg_time = 1
+    # variables
+    _preg_time = 2
     _max_age = 10
-
 
     def __init__(self, x_y: Tuple[int, int]):
         super().__init__(x_y)
-        self._ID_string = "M" + str(Mouse.ID).zfill(Environment.empty_field_spaces-1)
+        self._ID = Mouse.ID
         self._age = 0
         self._is_pregnant = False
         self._is_pregnant_with = None
         self._time_pregnant = 0
+        self._sex = Mouse.sex_dict[randint(0, 1)]
         Mouse.ID += 1
 
     def __str__(self):
-        return colored("M" + str(Mouse.ID).zfill(Environment.empty_field_spaces-1), 'blue')
+        if self._is_pregnant:
+            self._preg_string = 'P'
+        else:
+            self._preg_string = 'N'
+
+        if self._sex == 'male':
+            self._color = 'blue'
+        else:
+            self._color = 'cyan'
+
+        return colored(self._preg_string+ str(self._ID).zfill(Environment.empty_field_spaces-1), self._color)
 
 
 class Owl(Animal):
     ID = 0
 
+    #variables
+    _die_of_hunger = 3
+    _max_age = 10
+    _preg_time = 3
+
     def __init__(self, x_y: Tuple[int, int]):
         super().__init__(x_y)
-        self._ID_string = "O" + str(Owl.ID).zfill(Environment.empty_field_spaces-1)
+        self._ID = Owl.ID
         Owl.ID += 1
+        self._time_since_eaten =0
 
     def __str__(self):
-        return colored("O" + str(Owl.ID).zfill(Environment.empty_field_spaces-1), 'red')
+        return colored("O" + str(self._ID).zfill(Environment.empty_field_spaces-1), 'red')
 
 
 class Environment:
@@ -75,7 +92,7 @@ class Environment:
         for i, row in enumerate(self._fields):
             print("{:^3}".format(i), end=' ')
             for item in row:
-                print("["+item+"]", end='')
+                print("["+str(item)+"]", end='')
             print()
 
     def add_animal_at(self, animal: str, x_y: Tuple[int, int]):
@@ -83,13 +100,13 @@ class Environment:
         if animal == "mouse":
             new_mouse = Mouse(x_y)
             self._mice.insert(0, new_mouse)
-            self._fields[y][x] = "{:3}".format(new_mouse._ID_string)
-            self._mice_alive+=1
+            self._fields[y][x] = new_mouse
+            self._mice_alive += 1
 
         if animal == "owl":
             new_owl = Owl(x_y)
             self._owls.insert(0, new_owl)
-            self._fields[y][x] = "{:3}".format(new_owl._ID_string)
+            self._fields[y][x] = new_owl
 
     def is_legal_field(self, x_y: Tuple[int, int]):
         x, y = x_y
@@ -122,8 +139,17 @@ class Environment:
                             return try_dir(dir_options)
 
                     elif tile_req == "withMouse":
-                        if self._fields[y_cand][x_cand][0] == "M":
+                        if isinstance(self._fields[y_cand][x_cand], Mouse):
                             return candidate_tile
+                        else:
+                            return try_dir(dir_options)
+
+                    elif tile_req == "withMaleMouse":
+                        if isinstance(self._fields[y_cand][x_cand], Mouse):
+                            if self._fields[y_cand][x_cand]._sex == "male":
+                                return candidate_tile
+                            else:
+                                return try_dir(dir_options)
                         else:
                             return try_dir(dir_options)
                 else:
@@ -142,7 +168,7 @@ class Environment:
 
         # Update field
         x, y = x_y
-        self._fields[y][x] = "{:3}".format(animal._ID_string)
+        self._fields[y][x] = animal
 
     def owls_tick(self):
         for owl in self._owls:
@@ -163,7 +189,7 @@ class Environment:
             if mouse._alive:  # only do something if mouse is alive.
                 x, y = mouse._position
 
-                if self._fields[y][x][0] == 'O':  # if mouse on tile, kill mouse.
+                if isinstance(self._fields[y][x], Owl):  # if owl on tile, kill mouse.
                     mouse._alive = False
                     self._mice_alive -= 1
 
@@ -171,17 +197,9 @@ class Environment:
                     if mouse._is_pregnant:  # add pregnant time.
                         mouse._time_pregnant += 1
 
-                    mouse_near_x_y = self.get_adj_tile_for(mouse, "withMouse")
-                    if mouse_near_x_y != (-1, -1) and not mouse._is_pregnant:
-                        mouse._is_pregnant = True
-                        x, y = mouse_near_x_y
-                        mouse._is_pregnant_with = self._fields[y][x]
-
-
                     near_x_y = self.get_adj_tile_for(mouse, "randLegal")
-
-                    if near_x_y != (-1, -1):
-                        if mouse._time_pregnant >= Mouse._preg_time:
+                    if near_x_y != (-1, -1):  # if a tile is free nearby
+                        if mouse._time_pregnant >= Mouse._preg_time:  # if time to baby
                             self.add_animal_at("mouse", near_x_y)
                             mouse._time_pregnant = 0
                             mouse._is_pregnant = False
@@ -190,20 +208,30 @@ class Environment:
                         else:
                             self.animal_move_to(mouse, near_x_y)
 
+        ##pregnancies.
+        for mouse in mice_copy:
+            if mouse._alive and mouse._sex == 'female' and not mouse._is_pregnant:
+                mouse_near_x_y = self.get_adj_tile_for(mouse, "withMaleMouse")
+
+                if mouse_near_x_y != (-1, -1):
+                    mouse._is_pregnant = True
+                    mouse._is_pregnant_with = mouse_near_x_y
+
+
+
     def tick(self):
         self.owls_tick()
         self.mice_tick()
 
     def print_and_tick(self, no):
-        for i in range(0, no):
-            tick_string = "Tick: {}".format(i)
-            print(colored(tick_string,attrs=['underline','bold']))
-
+        print(colored("Initial board", attrs=['underline', 'bold']))
+        self.print()
+        print()
+        for i in range(1, no+1):
+            self.tick()
+            print(colored("Tick: {}".format(i), attrs=['underline', 'bold']))
             self.print()
             print("")
-            self.tick()
-            #time.sleep(1)
-    #def print_animation(self):
 
 
     def add_animals(self):
@@ -218,4 +246,4 @@ class Environment:
 
 
 if __name__ == '__main__':
-    environment = Environment(n=10, T=10, p=3, M=10, o=2)
+    environment = Environment(n=10, T=20, p=3, M=10, o=3)
