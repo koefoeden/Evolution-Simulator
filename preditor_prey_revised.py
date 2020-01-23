@@ -1,71 +1,20 @@
+from animals import *
 from random import randint, shuffle
 from typing import List, Dict, Tuple, Sequence, NewType
 import copy
-from termcolor import colored
-
+from termcolor import colored, cprint
 import time
+#import sys
+from os import system, name
+import colorama
 
-class Animal:
-    def __init__(self, x_y: Tuple[int, int]):
-        self._position = x_y
-        self._alive = True
-        self._speed = randint(1, 10)
-
-class Mouse(Animal):
-    ID = 0
-    sex_dict = {0: "male", 1: "female"}
-
-    # variables
-    _preg_time = 2
-    _max_age = 10
-
-    def __init__(self, x_y: Tuple[int, int]):
-        super().__init__(x_y)
-        self._ID = Mouse.ID
-        self._age = 0
-        self._is_pregnant = False
-        self._is_pregnant_with = None
-        self._time_pregnant = 0
-        self._sex = Mouse.sex_dict[randint(0, 1)]
-        Mouse.ID += 1
-
-    def __str__(self):
-        if self._is_pregnant:
-            self._preg_string = 'P'
-        else:
-            self._preg_string = 'N'
-
-        if self._sex == 'male':
-            self._color = 'blue'
-        else:
-            self._color = 'cyan'
-
-        return colored(self._preg_string+ str(self._ID).zfill(Environment.empty_field_spaces-1), self._color)
-
-
-class Owl(Animal):
-    ID = 0
-
-    #variables
-    _die_of_hunger = 3
-    _max_age = 10
-    _preg_time = 3
-
-    def __init__(self, x_y: Tuple[int, int]):
-        super().__init__(x_y)
-        self._ID = Owl.ID
-        Owl.ID += 1
-        self._time_since_eaten =0
-
-    def __str__(self):
-        return colored("O" + str(self._ID).zfill(Environment.empty_field_spaces-1), 'red')
 
 
 class Environment:
     empty_field_spaces = 4
 
     def __init__(self, n, T, p, M, o):
-        self._empty_field = ' '*4
+        self._empty_field = ' '*3
         self._n = n
         self._mice = []
         self._owls = []
@@ -87,12 +36,20 @@ class Environment:
     def print(self):
         print("    ", end='')
         for i in range(self._n):
-            print("{:^6}".format(i), end='')
+            print("{:^5}".format(i), end='')
         print()
         for i, row in enumerate(self._fields):
             print("{:^3}".format(i), end=' ')
             for item in row:
                 print("["+str(item)+"]", end='')
+                """
+                if item == self._empty_field:
+                    print("[" + self._empty_field + "]", end='')
+                else:
+                    print("[", end='')
+                    item.print()
+                    print("]", end='')
+                    """
             print()
 
     def add_animal_at(self, animal: str, x_y: Tuple[int, int]):
@@ -116,7 +73,7 @@ class Environment:
         x, y = x_y
         return self._fields[y][x]==self._empty_field
 
-    def get_adj_tile_for(self, animal: Animal, tile_req: str):
+    def get_adj_tile_for(self, animal, tile_req: str):
         # Initialize: Shuffling and copying
         dir_options = copy.copy(self._dir_options)
         shuffle(dir_options)
@@ -208,7 +165,7 @@ class Environment:
                         else:
                             self.animal_move_to(mouse, near_x_y)
 
-        ##pregnancies.
+        # pregnancies.
         for mouse in mice_copy:
             if mouse._alive and mouse._sex == 'female' and not mouse._is_pregnant:
                 mouse_near_x_y = self.get_adj_tile_for(mouse, "withMaleMouse")
@@ -216,8 +173,6 @@ class Environment:
                 if mouse_near_x_y != (-1, -1):
                     mouse._is_pregnant = True
                     mouse._is_pregnant_with = mouse_near_x_y
-
-
 
     def tick(self):
         self.owls_tick()
@@ -232,18 +187,34 @@ class Environment:
             print(colored("Tick: {}".format(i), attrs=['underline', 'bold']))
             self.print()
             print("")
-
+            time.sleep(0.5)
+            system("cls")
 
     def add_animals(self):
-        posibilities = [(x, y) for x in range(self._n) for y in range(self._n)]
-        shuffle(posibilities)
+        possibilities = [(x, y) for x in range(self._n) for y in range(self._n)]
+        shuffle(possibilities)
 
         for i in range(self._start_mice):
-            self.add_animal_at("mouse", posibilities[i])
+            self.add_animal_at("mouse", possibilities[i])
 
         for i2 in range(self._start_mice, self._start_mice + self._start_owls):
-            self.add_animal_at("owl", posibilities[i2])
+            self.add_animal_at("owl", possibilities[i2])
 
+
+    def clear(self):
+        if name == 'nt':
+            _ = system('cls')
 
 if __name__ == '__main__':
-    environment = Environment(n=10, T=20, p=3, M=10, o=3)
+    #colorama.init()
+    system('color')
+    environment = Environment(n=10, T=200, p=3, M=10, o=3)
+    #sys.stdout.flush()
+
+    """
+    for i in range(10):
+        sys.stdout.write("\r{0}>".format("=" * i))
+        sys.stdout.flush()
+        time.sleep(0.5)
+    
+    """
