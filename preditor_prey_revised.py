@@ -18,16 +18,19 @@ class Environment:
         self._n = n
         self._mice = []
         self._owls = []
+        self._animals = []
+        self._sleep_time = 2
 
         self._fields = [[self._empty_field for x in range(n)] for y in range(n)]
         self._mice_alive = 0
+        self._owls_alive = 0
 
         self._ticks = T
         #self._preg_time = p
         self._start_mice = M
         self._start_owls = o
 
-        self._dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        self._dir_options_constant = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
         #RUN
         self.add_animals()
@@ -42,28 +45,23 @@ class Environment:
             print("{:^3}".format(i), end=' ')
             for item in row:
                 print("["+str(item)+"]", end='')
-                """
-                if item == self._empty_field:
-                    print("[" + self._empty_field + "]", end='')
-                else:
-                    print("[", end='')
-                    item.print()
-                    print("]", end='')
-                    """
             print()
 
-    def add_animal_at(self, animal: str, x_y: Tuple[int, int]):
+    def add_animal_at(self, animal: str, x_y: Tuple[int, int], parents=None):
         x, y = x_y
         if animal == "mouse":
-            new_mouse = Mouse(x_y)
-            self._mice.insert(0, new_mouse)
+            new_mouse = Mouse(x_y, parents)
+            #self._mice.insert(0, new_mouse)
+            self._animals.insert(0, new_mouse)
             self._fields[y][x] = new_mouse
             self._mice_alive += 1
 
         if animal == "owl":
-            new_owl = Owl(x_y)
-            self._owls.insert(0, new_owl)
+            new_owl = Owl(x_y, parents)
+            #self._owls.insert(0, new_owl)
+            self._animals.insert(0, new_owl)
             self._fields[y][x] = new_owl
+            self._owls_alive += 1
 
     def is_legal_field(self, x_y: Tuple[int, int]):
         x, y = x_y
@@ -71,54 +69,58 @@ class Environment:
 
     def is_empty_field(self, x_y: Tuple[int, int]):
         x, y = x_y
-        return self._fields[y][x]==self._empty_field
+        return self._fields[y][x] == self._empty_field
 
     def get_adj_tile_for(self, animal, tile_req: str):
         # Initialize: Shuffling and copying
-        dir_options = copy.copy(self._dir_options)
-        shuffle(dir_options)
+        dir_options_call = copy.copy(self._dir_options_constant)
+        shuffle(dir_options_call)
 
         # Recursive function to try one direction at a time.
-        def try_dir(dir_options):
-            if dir_options == []: #base-case
+        def try_dir(dir_options_input):
+            if dir_options_input == []: #base-case
                 return (-1,-1)
             else:
-                chosen_dir = dir_options.pop()
+                chosen_dir = dir_options_input.pop()
                 candidate_tile = tuple(map(sum, zip(animal._position, chosen_dir)))
                 x_cand, y_cand = candidate_tile
 
                 if self.is_legal_field(candidate_tile):
 
-                    if tile_req == "randLegal":
+                    if tile_req == "empty":
                         if self.is_empty_field(candidate_tile):
                             return candidate_tile
-                        else:
-                            return try_dir(dir_options)
 
                     elif tile_req == "withMouse":
                         if isinstance(self._fields[y_cand][x_cand], Mouse):
                             return candidate_tile
-                        else:
-                            return try_dir(dir_options)
 
                     elif tile_req == "withMaleMouse":
                         if isinstance(self._fields[y_cand][x_cand], Mouse):
                             if self._fields[y_cand][x_cand]._sex == "male":
                                 return candidate_tile
-                            else:
-                                return try_dir(dir_options)
-                        else:
-                            return try_dir(dir_options)
-                else:
-                    return try_dir(dir_options)
 
-        return try_dir(dir_options)
+                    elif tile_req == "withMaleOwl":
+                        if isinstance(self._fields[y_cand][x_cand], Owl):
+                            if self._fields[y_cand][x_cand]._sex == "male":
+                                return candidate_tile
+
+                return try_dir(dir_options_input)
+
+        return try_dir(dir_options_call)
+
+    def get_ajd_legal_tile(self):
+        pass
+
+    def get_adj_mouse_tile(self):
+        pass
+
+    def get_adj_male_mouse_tile(self):
+        pass
 
     def animal_move_to(self, animal, x_y: Tuple[int, int]):
         # Clear field
-        init_x, init_y = animal._position
-
-        self._fields[init_y][init_x] = self._empty_field
+        self.clear_field(animal)
 
         # Update animals coordinates
         animal._position = x_y
@@ -127,20 +129,56 @@ class Environment:
         x, y = x_y
         self._fields[y][x] = animal
 
+    def clear_field(self, animal):
+        x, y = animal._position
+        self._fields[y][x] = self._empty_field
+
+
     def owls_tick(self):
-        for owl in self._owls:
-            mouse_x_y = self.get_adj_tile_for(owl, "withMouse")
-            if mouse_x_y != (-1, -1):
-                self.animal_move_to(owl, mouse_x_y)
+        owls_copy = copy.copy(self._owls)
 
-            else:
-                near_x_y = self.get_adj_tile_for(owl, "randLegal")
+        for owl in owls_copy:
+            if owl._alive:
+                owl._time_since_eaten += 1
 
-                if near_x_y != (-1, -1):
+                if owl._time_since_eaten == Owl._die_of_hunger:
+                    owl._alive = False
+                    self._owls_alive -= 1
+                    self.clear_field(owl)
+                    continue
+
+                near_x_y = self.get_adj_tile_for(owl, "empty")
+
+                if owl._is_pregnant:  # add pregnant time.
+                    owl._time_pregnant += 1
+
+                    if owl._time_pregnant >= Owl._preg_time:  # if time to baby
+                        if near_x_y != (-1, -1):
+                            self.add_animal_at("owl", near_x_y)
+                            owl._time_pregnant = 0
+                            owl._is_pregnant = False
+                            owl._is_pregnant_with = None
+                            continue
+
+                mouse_x_y = self.get_adj_tile_for(owl, "withMouse")
+                if mouse_x_y != (-1, -1):
+                    self.animal_move_to(owl, mouse_x_y)
+                    owl._time_since_eaten = 0
+                else:
                     self.animal_move_to(owl, near_x_y)
+
+        # pregnancies
+        for owl in owls_copy:
+            if owl._alive and owl._sex == 'female' and not owl._is_pregnant:
+                owl_near_x_y = self.get_adj_tile_for(owl, "withMaleOwl")
+
+                if owl_near_x_y != (-1, -1):
+                    owl._is_pregnant = True
+                    owl._is_pregnant_with = owl_near_x_y
 
     def mice_tick(self):
         mice_copy = copy.copy(self._mice)
+        mice_copy.sort(key=lambda mouse_elm: mouse_elm._speed)
 
         for mouse in mice_copy:  # loop through copy of mice list.
             if mouse._alive:  # only do something if mouse is alive.
@@ -154,10 +192,10 @@ class Environment:
                     if mouse._is_pregnant:  # add pregnant time.
                         mouse._time_pregnant += 1
 
-                    near_x_y = self.get_adj_tile_for(mouse, "randLegal")
+                    near_x_y = self.get_adj_tile_for(mouse, "empty")
                     if near_x_y != (-1, -1):  # if a tile is free nearby
                         if mouse._time_pregnant >= Mouse._preg_time:  # if time to baby
-                            self.add_animal_at("mouse", near_x_y)
+                            self.add_animal_at("mouse", near_x_y, parents=[mouse, mouse._is_pregnant_with])
                             mouse._time_pregnant = 0
                             mouse._is_pregnant = False
                             mouse._is_pregnant_with = None
@@ -169,25 +207,144 @@ class Environment:
         for mouse in mice_copy:
             if mouse._alive and mouse._sex == 'female' and not mouse._is_pregnant:
                 mouse_near_x_y = self.get_adj_tile_for(mouse, "withMaleMouse")
+                x, y = mouse_near_x_y
 
                 if mouse_near_x_y != (-1, -1):
                     mouse._is_pregnant = True
-                    mouse._is_pregnant_with = mouse_near_x_y
+                    mouse._is_pregnant_with = self._fields[y][x]
+
+    def animals_tick(self):
+        animals_copy = copy.copy(self._animals)
+        animals_copy.sort(key=lambda animal_elm: animal_elm._speed, reverse=True)
+
+        for animal in animals_copy:
+            if animal._alive:
+                x, y = animal._position
+
+                # it is a mouse
+                if isinstance(animal, Mouse):
+                    if isinstance(self._fields[y][x], Owl):  # if owl on tile, kill mouse.
+                        animal._alive = False
+                        self._mice_alive -= 1
+                        continue
+
+                else:  # it is an owl
+                    animal._time_since_eaten += 1
+
+                    if animal._time_since_eaten == Owl._die_of_hunger:
+                        animal._alive = False
+                        self._owls_alive -= 1
+                        self.clear_field(animal)
+                        continue
+
+                if animal._is_pregnant:  # add pregnant time.
+                    animal._time_pregnant += 1
+
+                #get empty field
+                near_x_y = self.get_adj_tile_for(animal, "empty")
+                if near_x_y != (-1, -1):  # if a tile is free nearby
+                    if animal._time_pregnant >= Animal._preg_time:  # if time to baby
+                        if isinstance(animal, Mouse):
+                            self.add_animal_at("mouse", near_x_y, parents=[animal, animal._is_pregnant_with])
+                        else:
+                            self.add_animal_at("owl", near_x_y, parents=[animal, animal._is_pregnant_with])
+                        animal._time_pregnant = 0
+                        animal._is_pregnant = False
+                        animal._is_pregnant_with = None
+                        continue
+
+                # hunt mouse if owl
+                if isinstance(animal, Owl):
+                    mouse_x_y = self.get_adj_tile_for(animal, "withMouse")
+                    if mouse_x_y != (-1, -1):
+                        self.animal_move_to(animal, mouse_x_y)
+                        animal._time_since_eaten = 0
+                        continue
+
+                if near_x_y != (-1, -1):
+                    self.animal_move_to(animal, near_x_y)
+
+        # pregnancies.
+        for animal in animals_copy:
+            if animal._alive and animal._sex == 'female' and not animal._is_pregnant:
+                if isinstance(animal, Mouse):
+                    male_near_x_y = self.get_adj_tile_for(animal, "withMaleMouse")
+                else:
+                    male_near_x_y = self.get_adj_tile_for(animal, "withMaleOwl")
+                x, y = male_near_x_y
+
+                if male_near_x_y != (-1, -1):
+                    animal._is_pregnant = True
+                    animal._is_pregnant_with = self._fields[y][x]
+
 
     def tick(self):
-        self.owls_tick()
-        self.mice_tick()
+        #self.owls_tick()
+        #self.mice_tick()
+        self.animals_tick()
+
+    def average_speed_mice(self):
+        total_speed = 0
+
+        for mouse in self._mice:
+            if mouse._alive:
+                total_speed += mouse._speed
+        if self._mice_alive > 0:
+            return int(total_speed/self._mice_alive)
+        else:
+            return "N/A"
+    def average_speed_owls(self):
+        total_speed = 0
+
+        for owl in self._owls:
+            if owl._alive:
+                total_speed += owl._speed
+        if self._owls_alive > 0:
+            return int(total_speed/self._owls_alive)
+        else:
+            return "N/A"
+
+    def average_speed(self):
+        total_speed_mice = 0
+        total_speed_owls = 0
+
+        for animal in self._animals:
+            if animal._alive:
+                if isinstance(animal, Mouse):
+                    total_speed_mice += animal._speed
+                else:
+                    total_speed_owls += animal._speed
+        if self._mice_alive > 0:
+            avg_speed_mice = int(total_speed_mice/self._mice_alive)
+        else:
+            avg_speed_mice = "N/A"
+
+        if self._owls_alive > 0:
+            avg_speed_owls = int(total_speed_owls/self._owls_alive)
+        else:
+            avg_speed_owls = "N/A"
+
+        return [avg_speed_mice, avg_speed_owls]
 
     def print_and_tick(self, no):
+        system("cls")
         print(colored("Initial board", attrs=['underline', 'bold']))
+        print()
         self.print()
         print()
+        print("Mice: {:<5}  Avg. speed: {}".format(self._mice_alive, self.average_speed_mice()))
+        print("Owls: {:<5}  Avg. speed: {}".format(self._owls_alive, self.average_speed_owls()))
+        time.sleep(5*self._sleep_time)
+        system("cls")
         for i in range(1, no+1):
             self.tick()
             print(colored("Tick: {}".format(i), attrs=['underline', 'bold']))
+            print()
             self.print()
-            print("")
-            time.sleep(0.5)
+            print()
+            print("Mice: {:<5}  Avg. speed: {}".format(self._mice_alive, self.average_speed()[0]))
+            print("Owls: {:<5}  Avg. speed: {}".format(self._owls_alive, self.average_speed()[1]))
+            time.sleep(self._sleep_time)
             system("cls")
 
     def add_animals(self):
@@ -201,20 +358,7 @@ class Environment:
             self.add_animal_at("owl", possibilities[i2])
 
 
-    def clear(self):
-        if name == 'nt':
-            _ = system('cls')
-
 if __name__ == '__main__':
-    #colorama.init()
     system('color')
-    environment = Environment(n=10, T=200, p=3, M=10, o=3)
-    #sys.stdout.flush()
+    environment = Environment(n=20, T=200, p=3, M=40, o=10)
 
-    """
-    for i in range(10):
-        sys.stdout.write("\r{0}>".format("=" * i))
-        sys.stdout.flush()
-        time.sleep(0.5)
-    
-    """
