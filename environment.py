@@ -146,28 +146,6 @@ class Environment:
         self.animals_tick()
         self._tick_no += 1
 
-    def average_speed_mice(self):
-        total_speed = 0
-
-        for mouse in self._mice:
-            if mouse._alive:
-                total_speed += mouse._speed
-        if self._mice_alive > 0:
-            return int(total_speed/self._mice_alive)
-        else:
-            return "N/A"
-
-    def average_speed_owls(self):
-        total_speed = 0
-
-        for owl in self._owls:
-            if owl._alive:
-                total_speed += owl._speed
-        if self._owls_alive > 0:
-            return int(total_speed/self._owls_alive)
-        else:
-            return "N/A"
-
     def average_speed(self):
         total_speed_mice = 0
         total_speed_owls = 0
@@ -190,7 +168,7 @@ class Environment:
 
         return [avg_speed_mice, avg_speed_owls]
 
-    def print(self):
+    def print_board(self):
         print("    ", end='')
         for i in range(self._n):
             print("{:^5}".format(i), end='')
@@ -201,24 +179,23 @@ class Environment:
                 print("["+str(item)+"]", end='')
             print()
 
-    def print_initial_board(self):
+    def print_info_and_board(self):
+        print()
+        self.print_board()
+        print()
+        print("Mice: {:<5}  Avg. speed: {}".format(self._mice_alive, self.average_speed()[0]))
+        print("Owls: {:<5}  Avg. speed: {}".format(self._owls_alive, self.average_speed()[1]))
+
+    def print_initial_tick(self):
         system("cls")
         print(colored("Initial board", attrs=['underline', 'bold']))
-        print()
-        self.print()
-        print()
-        print("Mice: {:<5}  Avg. speed: {}".format(self._mice_alive, self.average_speed_mice()))
-        print("Owls: {:<5}  Avg. speed: {}".format(self._owls_alive, self.average_speed_owls()))
+        self.print_info_and_board()
 
     def tick_and_print(self):
         system("cls")
         self.tick()
         print(colored("Tick: {}".format(self._tick_no), attrs=['underline', 'bold']))
-        print()
-        self.print()
-        print()
-        print("Mice: {:<5}  Avg. speed: {}".format(self._mice_alive, self.average_speed()[0]))
-        print("Owls: {:<5}  Avg. speed: {}".format(self._owls_alive, self.average_speed()[1]))
+        self.print_info_and_board()
 
     def tick_and_print_timed(self):
         for i in range(1, self._ticks):

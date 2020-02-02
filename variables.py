@@ -14,7 +14,7 @@ class Variables:
     inherit_die_of_hunger = False
     inherit_preg_time = False
     inherit_max_age = False
-    inherit_speed = False
+    inherit_speed = True
 
 
     # tick time:

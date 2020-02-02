@@ -75,13 +75,8 @@ class Mouse(Animal):
         self._time_alive += 1
         self._time_since_eaten += 1 # TODO: Implementation
 
-        # Check for death conditions - owl on tile or death of age.
-        if isinstance(self._environment_instance._fields[y][x], Owl):
-            self._alive = False
-            self._environment_instance._mice_alive -= 1
-            return
-
-        elif self._time_alive == self._max_age:
+        # Check for death conditions (death of age).
+        if self._time_alive == self._max_age:
             self._alive = False
             self._environment_instance._mice_alive -= 1
             self._environment_instance.clear_field(self)
@@ -147,7 +142,11 @@ class Owl(Animal):
             mouse_x_y = self._environment_instance.get_adj_tile_for(self, "withMouse")
 
             if mouse_x_y != (-1, -1):
+                x, y = mouse_x_y
+                self._environment_instance._fields[y][x]._alive = False
+                self._environment_instance._mice_alive -= 1
                 self._environment_instance.animal_move_to(self, mouse_x_y)
                 self._time_since_eaten = 0
+
             else:
                 self._environment_instance.animal_move_to(self, near_x_y)
