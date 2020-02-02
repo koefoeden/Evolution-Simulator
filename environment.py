@@ -1,4 +1,5 @@
 import animals
+from variables import Variables
 
 from random import shuffle
 from typing import Tuple
@@ -11,26 +12,25 @@ from os import system, name
 class Environment:
     empty_field_spaces = 4
 
-    def __init__(self, n, T, p, M, o):
+    def __init__(self, n, T, M, o):
         self._empty_field = ' '*3
         self._n = n
         self._mice = []
         self._owls = []
         self._animals = []
-        self._sleep_time = 2
+        self._sleep_time = Variables.sleep_time
 
         self._fields = [[self._empty_field for x in range(n)] for y in range(n)]
         self._mice_alive = 0
         self._owls_alive = 0
 
         self._ticks = T
-        #self._preg_time = p
         self._start_mice = M
         self._start_owls = o
 
         self._dir_options_constant = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
-        #RUN
+        # RUN
         self.add_animals()
         self.print_and_tick(self._ticks)
 
@@ -48,14 +48,14 @@ class Environment:
     def add_animal_at(self, animal: str, x_y: Tuple[int, int], parents=None):
         x, y = x_y
         if animal == "mouse":
-            new_mouse = animals.Mouse(x_y, parents)
+            new_mouse = animals.Mouse(x_y, parents, self)
             #self._mice.insert(0, new_mouse)
             self._animals.insert(0, new_mouse)
             self._fields[y][x] = new_mouse
             self._mice_alive += 1
 
         if animal == "owl":
-            new_owl = animals.Owl(x_y, parents)
+            new_owl = animals.Owl(x_y, parents, self)
             #self._owls.insert(0, new_owl)
             self._animals.insert(0, new_owl)
             self._fields[y][x] = new_owl
@@ -131,6 +131,7 @@ class Environment:
         x, y = animal._position
         self._fields[y][x] = self._empty_field
 
+    """
     def owls_tick(self):
         owls_copy = copy.copy(self._owls)
 
@@ -138,7 +139,7 @@ class Environment:
             if owl._alive:
                 owl._time_since_eaten += 1
 
-                if owl._time_since_eaten == animals.Owl._die_of_hunger:
+                if owl._time_since_eaten == owl._die_of_hunger:
                     owl._alive = False
                     self._owls_alive -= 1
                     self.clear_field(owl)
@@ -149,7 +150,7 @@ class Environment:
                 if owl._is_pregnant:  # add pregnant time.
                     owl._time_pregnant += 1
 
-                    if owl._time_pregnant >= animals.Owl._preg_time:  # if time to baby
+                    if owl._time_pregnant >= owl._preg_time:  # if time to baby
                         if near_x_y != (-1, -1):
                             self.add_animal_at("owl", near_x_y)
                             owl._time_pregnant = 0
@@ -209,6 +210,26 @@ class Environment:
                 if mouse_near_x_y != (-1, -1):
                     mouse._is_pregnant = True
                     mouse._is_pregnant_with = self._fields[y][x]
+"""
+    def animal_tick_2(self):
+        animals_copy = copy.copy(self._animals)
+        animals_copy.sort(key=lambda animal_elm: animal_elm._speed, reverse=True)
+
+        for animal in animals_copy:
+            if animal._alive:
+                animal.action()
+
+        for animal in animals_copy:
+            if animal._alive and animal._sex == 'female' and not animal._is_pregnant:
+                if isinstance(animal, animals.Mouse):
+                    male_near_x_y = self.get_adj_tile_for(animal, "withMaleMouse")
+                else:
+                    male_near_x_y = self.get_adj_tile_for(animal, "withMaleOwl")
+                x, y = male_near_x_y
+
+                if male_near_x_y != (-1, -1):
+                    animal._is_pregnant = True
+                    animal._is_pregnant_with = self._fields[y][x]
 
     def animals_tick(self):
         animals_copy = copy.copy(self._animals)
@@ -228,7 +249,7 @@ class Environment:
                 else:  # it is an owl
                     animal._time_since_eaten += 1
 
-                    if animal._time_since_eaten == animals.Owl._die_of_hunger:
+                    if animal._time_since_eaten == animal._die_of_hunger:
                         animal._alive = False
                         self._owls_alive -= 1
                         self.clear_field(animal)
@@ -240,7 +261,7 @@ class Environment:
                 #get empty field
                 near_x_y = self.get_adj_tile_for(animal, "empty")
                 if near_x_y != (-1, -1):  # if a tile is free nearby
-                    if animal._time_pregnant >= animals.Animal._preg_time:  # if time to baby
+                    if animal._time_pregnant >= animal._preg_time:  # if time to baby
                         if isinstance(animal, animals.Mouse):
                             self.add_animal_at("mouse", near_x_y, parents=[animal, animal._is_pregnant_with])
                         else:
@@ -277,7 +298,8 @@ class Environment:
     def tick(self):
         # self.owls_tick()
         # self.mice_tick()
-        self.animals_tick()
+        # self.animals_tick()
+        self.animal_tick_2()
 
     def average_speed_mice(self):
         total_speed = 0
