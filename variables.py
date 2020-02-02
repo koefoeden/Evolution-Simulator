@@ -2,12 +2,12 @@ class Variables:
     # mice
     mouse_die_of_hunger = 5 # TODO: implement functionality
     mouse_preg_time = 5
-    mouse_max_age = 10  # TODO: implement functionality
+    mouse_max_age = 100  # TODO: implement functionality
 
     # owls
     owl_die_of_hunger = 10
     owl_preg_time = 5
-    owl_max_age = 100 # TODO: implement functionality
+    owl_max_age = 500 # TODO: implement functionality
 
     # inheritance
     rand_variance_trait = 50
@@ -21,4 +21,4 @@ class Variables:
     sleep_time = 0.5
 
     # keyboard mode
-    keyboard_mode = False
+    keyboard_mode = True

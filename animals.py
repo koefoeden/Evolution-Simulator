@@ -72,17 +72,29 @@ class Mouse(Animal):
 
     def action(self):
         x, y = self._position
+        self._time_alive += 1
+        self._time_since_eaten += 1 # TODO: Implementation
 
-        if isinstance(self._environment_instance._fields[y][x], Owl):  # if owl on tile, kill mouse.
+        # Check for death conditions - owl on tile or death of age.
+        if isinstance(self._environment_instance._fields[y][x], Owl):
             self._alive = False
             self._environment_instance._mice_alive -= 1
+            return
 
-        else:  # action for alive mice.
+        elif self._time_alive == self._max_age:
+            self._alive = False
+            self._environment_instance._mice_alive -= 1
+            self._environment_instance.clear_field(self)
+            return
+
+        # Otherwise, do something
+        else:
             if self._is_pregnant:  # add pregnant time.
                 self._time_pregnant += 1
 
+            # Check for empty space nearby.
             near_x_y = self._environment_instance.get_adj_tile_for(self, "empty")
-            if near_x_y != (-1, -1):  # if a tile is free nearby
+            if near_x_y != (-1, -1):
                 if self._time_pregnant >= self._preg_time:  # if time to baby
                     self._environment_instance.add_animal_at("mouse", near_x_y, parents=[self, self._is_pregnant_with])
                     self._time_pregnant = 0
@@ -91,6 +103,7 @@ class Mouse(Animal):
 
                 else:
                     self._environment_instance.animal_move_to(self, near_x_y)
+
 
 class Owl(Animal):
     ID = 0
@@ -109,8 +122,9 @@ class Owl(Animal):
 
     def action(self):
         self._time_since_eaten += 1
+        self._time_alive += 1
 
-        if self._time_since_eaten == self._die_of_hunger:
+        if self._time_since_eaten == self._die_of_hunger or self._time_alive == self._max_age:
             self._alive = False
             self._environment_instance._owls_alive -= 1
             self._environment_instance.clear_field(self)
