@@ -1,4 +1,9 @@
-from preditor_prey_revised import *
+import environment
+import app
+
+from random import randint
+from typing import Tuple
+from termcolor import colored
 
 
 class Animal:
@@ -17,6 +22,7 @@ class Animal:
         self._time_since_eaten = 0
         self._time_alive = 0
         self._parents = parents
+        self._color = 'black'
 
         # variables
 
@@ -27,11 +33,12 @@ class Animal:
             self._speed = int(mean_parent_speed + rand_speed_contribution)
         else:
             self._speed = randint(1, 100)
+
     def __str__(self):
         if self._is_pregnant:
-            return colored(str(self._speed).zfill(Environment.empty_field_spaces - 1), self._color, attrs=['underline'])
+            return colored(str(self._speed).zfill(environment.Environment.empty_field_spaces - 1), self._color, attrs=['underline'])
         else:
-            return colored(str(self._speed).zfill(Environment.empty_field_spaces - 1), self._color)
+            return colored(str(self._speed).zfill(environment.Environment.empty_field_spaces - 1), self._color)
 
 
 class Mouse(Animal):
@@ -49,11 +56,12 @@ class Mouse(Animal):
         Mouse.ID += 1
         self._color = Mouse._sex_color_dict[self._sex]
 
+
 class Owl(Animal):
     ID = 0
     _sex_color_dict = {'male': "red", 'female': 'yellow'}
 
-    #variables
+    # variables
     _die_of_hunger = 10
     _preg_time = 3
     _max_age = 10

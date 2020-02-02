@@ -1,13 +1,11 @@
-from animals import *
-from random import randint, shuffle
-from typing import List, Dict, Tuple, Sequence, NewType
-import copy
-from termcolor import colored, cprint
-import time
-#import sys
-from os import system, name
-import colorama
+import animals
 
+from random import shuffle
+from typing import Tuple
+import copy
+from termcolor import colored
+import time
+from os import system, name
 
 
 class Environment:
@@ -50,14 +48,14 @@ class Environment:
     def add_animal_at(self, animal: str, x_y: Tuple[int, int], parents=None):
         x, y = x_y
         if animal == "mouse":
-            new_mouse = Mouse(x_y, parents)
+            new_mouse = animals.Mouse(x_y, parents)
             #self._mice.insert(0, new_mouse)
             self._animals.insert(0, new_mouse)
             self._fields[y][x] = new_mouse
             self._mice_alive += 1
 
         if animal == "owl":
-            new_owl = Owl(x_y, parents)
+            new_owl = animals.Owl(x_y, parents)
             #self._owls.insert(0, new_owl)
             self._animals.insert(0, new_owl)
             self._fields[y][x] = new_owl
@@ -92,16 +90,16 @@ class Environment:
                             return candidate_tile
 
                     elif tile_req == "withMouse":
-                        if isinstance(self._fields[y_cand][x_cand], Mouse):
+                        if isinstance(self._fields[y_cand][x_cand], animals.Mouse):
                             return candidate_tile
 
                     elif tile_req == "withMaleMouse":
-                        if isinstance(self._fields[y_cand][x_cand], Mouse):
+                        if isinstance(self._fields[y_cand][x_cand], animals.Mouse):
                             if self._fields[y_cand][x_cand]._sex == "male":
                                 return candidate_tile
 
                     elif tile_req == "withMaleOwl":
-                        if isinstance(self._fields[y_cand][x_cand], Owl):
+                        if isinstance(self._fields[y_cand][x_cand], animals.Owl):
                             if self._fields[y_cand][x_cand]._sex == "male":
                                 return candidate_tile
 
@@ -133,7 +131,6 @@ class Environment:
         x, y = animal._position
         self._fields[y][x] = self._empty_field
 
-
     def owls_tick(self):
         owls_copy = copy.copy(self._owls)
 
@@ -141,7 +138,7 @@ class Environment:
             if owl._alive:
                 owl._time_since_eaten += 1
 
-                if owl._time_since_eaten == Owl._die_of_hunger:
+                if owl._time_since_eaten == animals.Owl._die_of_hunger:
                     owl._alive = False
                     self._owls_alive -= 1
                     self.clear_field(owl)
@@ -152,7 +149,7 @@ class Environment:
                 if owl._is_pregnant:  # add pregnant time.
                     owl._time_pregnant += 1
 
-                    if owl._time_pregnant >= Owl._preg_time:  # if time to baby
+                    if owl._time_pregnant >= animals.Owl._preg_time:  # if time to baby
                         if near_x_y != (-1, -1):
                             self.add_animal_at("owl", near_x_y)
                             owl._time_pregnant = 0
@@ -184,7 +181,7 @@ class Environment:
             if mouse._alive:  # only do something if mouse is alive.
                 x, y = mouse._position
 
-                if isinstance(self._fields[y][x], Owl):  # if owl on tile, kill mouse.
+                if isinstance(self._fields[y][x], animals.Owl):  # if owl on tile, kill mouse.
                     mouse._alive = False
                     self._mice_alive -= 1
 
@@ -194,7 +191,7 @@ class Environment:
 
                     near_x_y = self.get_adj_tile_for(mouse, "empty")
                     if near_x_y != (-1, -1):  # if a tile is free nearby
-                        if mouse._time_pregnant >= Mouse._preg_time:  # if time to baby
+                        if mouse._time_pregnant >= animals.Mouse._preg_time:  # if time to baby
                             self.add_animal_at("mouse", near_x_y, parents=[mouse, mouse._is_pregnant_with])
                             mouse._time_pregnant = 0
                             mouse._is_pregnant = False
@@ -222,8 +219,8 @@ class Environment:
                 x, y = animal._position
 
                 # it is a mouse
-                if isinstance(animal, Mouse):
-                    if isinstance(self._fields[y][x], Owl):  # if owl on tile, kill mouse.
+                if isinstance(animal, animals.Mouse):
+                    if isinstance(self._fields[y][x], animals.Owl):  # if owl on tile, kill mouse.
                         animal._alive = False
                         self._mice_alive -= 1
                         continue
@@ -231,7 +228,7 @@ class Environment:
                 else:  # it is an owl
                     animal._time_since_eaten += 1
 
-                    if animal._time_since_eaten == Owl._die_of_hunger:
+                    if animal._time_since_eaten == animals.Owl._die_of_hunger:
                         animal._alive = False
                         self._owls_alive -= 1
                         self.clear_field(animal)
@@ -243,8 +240,8 @@ class Environment:
                 #get empty field
                 near_x_y = self.get_adj_tile_for(animal, "empty")
                 if near_x_y != (-1, -1):  # if a tile is free nearby
-                    if animal._time_pregnant >= Animal._preg_time:  # if time to baby
-                        if isinstance(animal, Mouse):
+                    if animal._time_pregnant >= animals.Animal._preg_time:  # if time to baby
+                        if isinstance(animal, animals.Mouse):
                             self.add_animal_at("mouse", near_x_y, parents=[animal, animal._is_pregnant_with])
                         else:
                             self.add_animal_at("owl", near_x_y, parents=[animal, animal._is_pregnant_with])
@@ -254,7 +251,7 @@ class Environment:
                         continue
 
                 # hunt mouse if owl
-                if isinstance(animal, Owl):
+                if isinstance(animal, animals.Owl):
                     mouse_x_y = self.get_adj_tile_for(animal, "withMouse")
                     if mouse_x_y != (-1, -1):
                         self.animal_move_to(animal, mouse_x_y)
@@ -267,7 +264,7 @@ class Environment:
         # pregnancies.
         for animal in animals_copy:
             if animal._alive and animal._sex == 'female' and not animal._is_pregnant:
-                if isinstance(animal, Mouse):
+                if isinstance(animal, animals.Mouse):
                     male_near_x_y = self.get_adj_tile_for(animal, "withMaleMouse")
                 else:
                     male_near_x_y = self.get_adj_tile_for(animal, "withMaleOwl")
@@ -277,10 +274,9 @@ class Environment:
                     animal._is_pregnant = True
                     animal._is_pregnant_with = self._fields[y][x]
 
-
     def tick(self):
-        #self.owls_tick()
-        #self.mice_tick()
+        # self.owls_tick()
+        # self.mice_tick()
         self.animals_tick()
 
     def average_speed_mice(self):
@@ -293,6 +289,7 @@ class Environment:
             return int(total_speed/self._mice_alive)
         else:
             return "N/A"
+
     def average_speed_owls(self):
         total_speed = 0
 
@@ -310,7 +307,7 @@ class Environment:
 
         for animal in self._animals:
             if animal._alive:
-                if isinstance(animal, Mouse):
+                if isinstance(animal, animals.Mouse):
                     total_speed_mice += animal._speed
                 else:
                     total_speed_owls += animal._speed
@@ -356,9 +353,4 @@ class Environment:
 
         for i2 in range(self._start_mice, self._start_mice + self._start_owls):
             self.add_animal_at("owl", possibilities[i2])
-
-
-if __name__ == '__main__':
-    system('color')
-    environment = Environment(n=20, T=200, p=3, M=40, o=10)
 
