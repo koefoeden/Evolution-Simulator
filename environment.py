@@ -29,8 +29,6 @@ class Environment:
         self._start_mice = m
         self._start_owls = o
 
-        self._dir_options_constant = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-
         # INITIALIZE
         self.add_animals()
 
@@ -38,14 +36,14 @@ class Environment:
         x, y = x_y
         if animal == "mouse":
             new_mouse = animals.Mouse(x_y, parents, self)
-            #self._mice.insert(0, new_mouse)
+            self._mice.insert(0, new_mouse)
             self._animals.insert(0, new_mouse)
             self._fields[y][x] = new_mouse
             self._mice_alive += 1
 
         if animal == "owl":
             new_owl = animals.Owl(x_y, parents, self)
-            #self._owls.insert(0, new_owl)
+            self._owls.insert(0, new_owl)
             self._animals.insert(0, new_owl)
             self._fields[y][x] = new_owl
             self._owls_alive += 1
@@ -70,7 +68,7 @@ class Environment:
 
     def get_adj_tile_for(self, animal, tile_req: str):
         # Initialize: Shuffling and copying
-        dir_options_call = copy.copy(self._dir_options_constant)
+        dir_options_call = copy.copy(Variables.dir_options)
         shuffle(dir_options_call)
 
         # Recursive function to try one direction at a time.
@@ -85,11 +83,19 @@ class Environment:
                 if self.is_legal_field(candidate_tile):
 
                     if tile_req == "empty":
-                        if self.is_empty_field(candidate_tile):
+                        if self.is_empty_field(candidate_tile) or self._fields[y_cand][x_cand] == animal:
                             return candidate_tile
 
                     elif tile_req == "withMouse":
                         if isinstance(self._fields[y_cand][x_cand], animals.Mouse):
+                            return candidate_tile
+
+                    elif tile_req == "withOwl":
+                        if isinstance(self._fields[y_cand][x_cand], animals.Owl):
+                            return candidate_tile
+
+                    elif tile_req == "run":
+                        if self.is_empty_field(candidate_tile):
                             return candidate_tile
 
                     elif tile_req == "withMaleMouse":
@@ -121,13 +127,56 @@ class Environment:
         x, y = animal._position
         self._fields[y][x] = self._empty_field
 
-    def animals_tick(self):
+    def owls_tick(self):
+        owls_copy = copy.copy(self._owls)
+        #shuffle(owls_copy)
+        owls_copy.sort(key=lambda animal_elm: animal_elm._speed, reverse=True)
+        for owl in owls_copy:
+            if owl._alive:
+                owl.action()
+                owl._has_moved = True
+
+    def mice_tick(self):
+        mice_copy = copy.copy(self._mice)
+        #shuffle(mice_copy)
+        mice_copy.sort(key=lambda animal_elm: animal_elm._speed, reverse=True)
+        for mouse in mice_copy:
+            if mouse._alive and not mouse._has_moved:
+                mouse.action()
+                mouse._has_moved = True
+
+    def update_pregnancies(self):
         animals_copy = copy.copy(self._animals)
-        animals_copy.sort(key=lambda animal_elm: animal_elm._speed, reverse=True)
+        shuffle(animals_copy)
 
         for animal in animals_copy:
+            if animal._alive and animal._sex == 'female' and not animal._is_pregnant:
+                if isinstance(animal, animals.Mouse):
+                    male_near_x_y = self.get_adj_tile_for(animal, "withMaleMouse")
+                else:
+                    male_near_x_y = self.get_adj_tile_for(animal, "withMaleOwl")
+                x, y = male_near_x_y
+
+                if male_near_x_y != (-1, -1):
+                    animal._is_pregnant = True
+                    animal._is_pregnant_with = self._fields[y][x]
+
+    def reset_moves(self):
+        for animal in self._animals:
             if animal._alive:
+                animal._has_moved = False
+    """
+    def animals_tick(self):
+        #animals_copy = copy.copy(self._animals)
+        #shuffle(animals_copy)
+
+
+        #animals_copy.sort(key=lambda animal_elm: animal_elm._speed, reverse=True)
+
+        for animal in animals_copy:
+            if animal._alive and not animal._has_moved:
                 animal.action()
+                animal._has_moved = True
 
         # pregnancies
         for animal in animals_copy:
@@ -142,8 +191,17 @@ class Environment:
                     animal._is_pregnant = True
                     animal._is_pregnant_with = self._fields[y][x]
 
+        for animal in animals_copy:
+            if animal._alive:
+                animal._has_moved = False
+    """
+
     def tick(self):
-        self.animals_tick()
+        #self.animals_tick()
+        self.owls_tick()
+        self.mice_tick()
+        self.update_pregnancies()
+        self.reset_moves()
         self._tick_no += 1
 
     def average_speed(self):

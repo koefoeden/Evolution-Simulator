@@ -16,23 +16,16 @@ class Animal:
         self._is_pregnant_with = None
         self._time_pregnant = 0
         self._sex = Animal._sex_dict[randint(0, 1)]
-        self._age = 0
         self._time_since_eaten = 0
-        self._time_alive = 0
+        self._age = 0
         self._parents = parents
         self._color = None
         self._environment_instance = environment_instance
+        self._has_moved = False
 
         # variables
-
         if parents and Variables.inherit_speed:
             self._speed = self.inherit("speed")
-            """
-            mean_parent_speed = (parents[0]._speed+parents[1]._speed)/2
-            rand_variance_int = randint(-Variables.rand_variance_speed, Variables.rand_variance_speed)
-            rand_speed_contribution = (mean_parent_speed/100)*rand_variance_int
-            self._speed = int(mean_parent_speed + rand_speed_contribution)
-            """
         else:
             self._speed = randint(1, 100)
 
@@ -71,33 +64,42 @@ class Mouse(Animal):
         self._max_age = Variables.mouse_max_age
 
     def action(self):
-        x, y = self._position
-        self._time_alive += 1
-        self._time_since_eaten += 1 # TODO: Implementation
+        if not self._has_moved:
+            x, y = self._position
+            self._age += 1
+            self._time_since_eaten += 1  # TODO: Implementation
 
-        # Check for death conditions (death of age).
-        if self._time_alive == self._max_age:
-            self._alive = False
-            self._environment_instance._mice_alive -= 1
-            self._environment_instance.clear_field(self)
-            return
+            # Check for death conditions (death of age).
+            if self._age == self._max_age and self._max_age != 0:
+                self._alive = False
+                self._environment_instance._mice_alive -= 1
+                self._environment_instance.clear_field(self)
+                return
 
-        # Otherwise, do something
-        else:
-            if self._is_pregnant:  # add pregnant time.
-                self._time_pregnant += 1
+            # Otherwise, do something
+            else:
+                if self._is_pregnant:  # add pregnant time.
+                    self._time_pregnant += 1
 
-            # Check for empty space nearby.
-            near_x_y = self._environment_instance.get_adj_tile_for(self, "empty")
-            if near_x_y != (-1, -1):
-                if self._time_pregnant >= self._preg_time:  # if time to baby
-                    self._environment_instance.add_animal_at("mouse", near_x_y, parents=[self, self._is_pregnant_with])
-                    self._time_pregnant = 0
-                    self._is_pregnant = False
-                    self._is_pregnant_with = None
+                # check for nearby owl
+                owl_x_y = self._environment_instance.get_adj_tile_for(self, "withOwl")
+                if owl_x_y != (-1, -1):
+                    run_x_y = self._environment_instance.get_adj_tile_for(self, "run")
+                    if run_x_y != (-1, -1):
+                        self._environment_instance.animal_move_to(self, run_x_y)
+                    return
 
-                else:
-                    self._environment_instance.animal_move_to(self, near_x_y)
+                # Check for empty space nearby.
+                near_x_y = self._environment_instance.get_adj_tile_for(self, "empty")
+                if near_x_y != (-1, -1) and near_x_y != (x, y):
+                    if self._time_pregnant >= self._preg_time:  # if time to baby
+                        self._environment_instance.add_animal_at("mouse", near_x_y, parents=[self, self._is_pregnant_with])
+                        self._time_pregnant = 0
+                        self._is_pregnant = False
+                        self._is_pregnant_with = None
+
+                    else:
+                        self._environment_instance.animal_move_to(self, near_x_y)
 
 
 class Owl(Animal):
@@ -117,9 +119,9 @@ class Owl(Animal):
 
     def action(self):
         self._time_since_eaten += 1
-        self._time_alive += 1
+        self._age += 1
 
-        if self._time_since_eaten == self._die_of_hunger or self._time_alive == self._max_age:
+        if (self._time_since_eaten == self._die_of_hunger and self._die_of_hunger != 0) or (self._age == self._max_age and self._max_age != 0):
             self._alive = False
             self._environment_instance._owls_alive -= 1
             self._environment_instance.clear_field(self)
@@ -131,7 +133,7 @@ class Owl(Animal):
             if self._is_pregnant:  # add pregnant time.
                 self._time_pregnant += 1
 
-                if self._time_pregnant >= self._preg_time:  # if time to baby
+                if self._time_pregnant >= self._preg_time != 0:  # if time to baby
                     if near_x_y != (-1, -1):
                         self._environment_instance.add_animal_at("owl", near_x_y)
                         self._time_pregnant = 0
@@ -143,10 +145,21 @@ class Owl(Animal):
 
             if mouse_x_y != (-1, -1):
                 x, y = mouse_x_y
-                self._environment_instance._fields[y][x]._alive = False
-                self._environment_instance._mice_alive -= 1
-                self._environment_instance.animal_move_to(self, mouse_x_y)
-                self._time_since_eaten = 0
+                mouse_near = self._environment_instance._fields[y][x]
+                if mouse_near._speed <= self._speed:
+                    mouse_near._alive = False
+                    self._environment_instance._mice_alive -= 1
+                    self._time_since_eaten = 0
+                    self._environment_instance.animal_move_to(self, mouse_x_y)
+
+                else:
+                    mouse_near.action()
+                    mouse_near._has_moved = True
+                    if mouse_near._position == mouse_x_y:
+                        mouse_near._alive = False
+                        self._environment_instance._mice_alive -= 1
+                        self._time_since_eaten = 0
+                    self._environment_instance.animal_move_to(self, mouse_x_y)
 
             else:
                 self._environment_instance.animal_move_to(self, near_x_y)

@@ -1,16 +1,19 @@
 class Variables:
+    # moving
+    dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]
+
     # mice
     mouse_die_of_hunger = 5 # TODO: implement functionality
-    mouse_preg_time = 5
-    mouse_max_age = 100  # TODO: implement functionality
+    mouse_preg_time = 4
+    mouse_max_age = 0
 
     # owls
-    owl_die_of_hunger = 10
-    owl_preg_time = 5
-    owl_max_age = 500 # TODO: implement functionality
+    owl_die_of_hunger = 0
+    owl_preg_time = 0
+    owl_max_age = 0
 
     # inheritance
-    rand_variance_trait = 50
+    rand_variance_trait = 20
     inherit_die_of_hunger = False
     inherit_preg_time = False
     inherit_max_age = False
