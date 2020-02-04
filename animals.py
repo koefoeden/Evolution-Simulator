@@ -92,7 +92,7 @@ class Mouse(Animal):
                 # Check for empty space nearby.
                 near_x_y = self._environment_instance.get_adj_tile_for(self, "empty")
                 if near_x_y != (-1, -1) and near_x_y != (x, y):
-                    if self._time_pregnant >= self._preg_time:  # if time to baby
+                    if self._time_pregnant >= self._preg_time != 0:  # if time to baby
                         self._environment_instance.add_animal_at("mouse", near_x_y, parents=[self, self._is_pregnant_with])
                         self._time_pregnant = 0
                         self._is_pregnant = False
@@ -118,6 +118,7 @@ class Owl(Animal):
         self._max_age = Variables.owl_max_age
 
     def action(self):
+        x, y = self._position
         self._time_since_eaten += 1
         self._age += 1
 
@@ -134,7 +135,7 @@ class Owl(Animal):
                 self._time_pregnant += 1
 
                 if self._time_pregnant >= self._preg_time != 0:  # if time to baby
-                    if near_x_y != (-1, -1):
+                    if near_x_y != (-1, -1) and near_x_y != (x, y):
                         self._environment_instance.add_animal_at("owl", near_x_y)
                         self._time_pregnant = 0
                         self._is_pregnant = False

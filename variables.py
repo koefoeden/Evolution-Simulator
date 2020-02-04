@@ -1,10 +1,10 @@
 class Variables:
     # moving
-    dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]
+    dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0,0)]
 
     # mice
-    mouse_die_of_hunger = 5 # TODO: implement functionality
-    mouse_preg_time = 4
+    mouse_die_of_hunger = 0 # TODO: implement functionality
+    mouse_preg_time = 0
     mouse_max_age = 0
 
     # owls
