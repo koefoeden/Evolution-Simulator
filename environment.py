@@ -7,6 +7,17 @@ import copy
 from termcolor import colored
 import time
 from os import system, name
+import colorama
+
+colorama.init()
+
+
+def restart_cursor():
+    print("\x1b[{};{}H".format(1, 1))
+
+
+def clear_screen():
+    print("\x1b[2J")
 
 
 class Environment:
@@ -245,17 +256,24 @@ class Environment:
         print("Owls: {:<5}  Avg. speed: {}".format(self._owls_alive, self.average_speed()[1]))
 
     def print_initial_tick(self):
-        system("cls")
+        clear_screen()
+        restart_cursor()
         print(colored("Initial board", attrs=['underline', 'bold']))
         self.print_info_and_board()
 
+
     def tick_and_print(self):
-        system("cls")
+        #system("cls")
+        restart_cursor()
         self.tick()
-        print(colored("Tick: {}".format(self._tick_no), attrs=['underline', 'bold']))
+        print(colored("Tick: {}         ".format(self._tick_no), attrs=['underline', 'bold']))
         self.print_info_and_board()
+
+
 
     def tick_and_print_timed(self):
         for i in range(1, self._ticks):
             self.tick_and_print()
             time.sleep(self._sleep_time)
+
+
