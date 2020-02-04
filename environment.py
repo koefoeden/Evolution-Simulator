@@ -9,11 +9,11 @@ import time
 from os import system, name
 import colorama
 
-colorama.init()
+#colorama.init()
 
 
 def restart_cursor():
-    print("\x1b[{};{}H".format(1, 1))
+    print("\x1b[1;1H")
 
 
 def clear_screen():
@@ -266,7 +266,7 @@ class Environment:
         #system("cls")
         restart_cursor()
         self.tick()
-        print(colored("Tick: {}         ".format(self._tick_no), attrs=['underline', 'bold']))
+        print(colored("Tick: {}         ".format(self._tick_no), attrs=['bold']))
         self.print_info_and_board()
 
 

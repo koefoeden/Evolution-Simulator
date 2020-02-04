@@ -4,7 +4,7 @@ class Variables:
 
     # mice
     mouse_die_of_hunger = 0 # TODO: implement functionality
-    mouse_preg_time = 0
+    mouse_preg_time = 2
     mouse_max_age = 0
 
     # owls
@@ -22,6 +22,7 @@ class Variables:
 
     # tick time:
     sleep_time = 0.5
+    slow_mode_sleep_time = 0.1
 
     # keyboard mode
     keyboard_mode = True
