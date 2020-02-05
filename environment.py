@@ -175,39 +175,8 @@ class Environment:
         for animal in self._animals:
             if animal._alive:
                 animal._has_moved = False
-    """
-    def animals_tick(self):
-        #animals_copy = copy.copy(self._animals)
-        #shuffle(animals_copy)
-
-
-        #animals_copy.sort(key=lambda animal_elm: animal_elm._speed, reverse=True)
-
-        for animal in animals_copy:
-            if animal._alive and not animal._has_moved:
-                animal.action()
-                animal._has_moved = True
-
-        # pregnancies
-        for animal in animals_copy:
-            if animal._alive and animal._sex == 'female' and not animal._is_pregnant:
-                if isinstance(animal, animals.Mouse):
-                    male_near_x_y = self.get_adj_tile_for(animal, "withMaleMouse")
-                else:
-                    male_near_x_y = self.get_adj_tile_for(animal, "withMaleOwl")
-                x, y = male_near_x_y
-
-                if male_near_x_y != (-1, -1):
-                    animal._is_pregnant = True
-                    animal._is_pregnant_with = self._fields[y][x]
-
-        for animal in animals_copy:
-            if animal._alive:
-                animal._has_moved = False
-    """
 
     def tick(self):
-        #self.animals_tick()
         self.owls_tick()
         self.mice_tick()
         self.update_pregnancies()
@@ -218,12 +187,11 @@ class Environment:
         total_speed_mice = 0
         total_speed_owls = 0
 
-        for animal in self._animals:
-            if animal._alive:
-                if isinstance(animal, animals.Mouse):
-                    total_speed_mice += animal._speed
-                else:
-                    total_speed_owls += animal._speed
+        for mouse in self._mice:
+            total_speed_mice += mouse._speed
+        for owl in self._owls:
+            total_speed_owls += owl._speed
+
         if self._mice_alive > 0:
             avg_speed_mice = int(total_speed_mice/self._mice_alive)
         else:
@@ -257,22 +225,13 @@ class Environment:
     def print_initial_tick(self):
         clear_screen()
         restart_cursor()
-        print(colored("Initial board", attrs=['underline', 'bold']))
+        print(colored("Initial board", attrs=['bold']))
         self.print_info_and_board()
 
-
     def tick_and_print(self):
-        #system("cls")
         restart_cursor()
         self.tick()
         print(colored("Tick: {}         ".format(self._tick_no), attrs=['bold']))
         self.print_info_and_board()
-
-
-
-    def tick_and_print_timed(self):
-        for i in range(1, self._ticks):
-            self.tick_and_print()
-            time.sleep(self._sleep_time)
 
 

@@ -3,7 +3,7 @@ class Variables:
     dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0,0)]
 
     # mechanics:
-    rand_catch = True
+    rand_catch = False
 
     # mice
     mouse_die_of_hunger = 0 # TODO: implement functionality
