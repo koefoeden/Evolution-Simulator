@@ -7,7 +7,7 @@ import copy
 from termcolor import colored
 import time
 from os import system, name
-import colorama
+#import colorama
 
 #colorama.init()
 
@@ -47,15 +47,15 @@ class Environment:
         x, y = x_y
         if animal == "mouse":
             new_mouse = animals.Mouse(x_y, parents, self)
-            self._mice.insert(0, new_mouse)
-            self._animals.insert(0, new_mouse)
+            self._mice.append(new_mouse)
+            self._animals.append(new_mouse)
             self._fields[y][x] = new_mouse
             self._mice_alive += 1
 
         if animal == "owl":
             new_owl = animals.Owl(x_y, parents, self)
-            self._owls.insert(0, new_owl)
-            self._animals.insert(0, new_owl)
+            self._owls.append(new_owl)
+            self._animals.append(new_owl)
             self._fields[y][x] = new_owl
             self._owls_alive += 1
 
@@ -140,8 +140,7 @@ class Environment:
 
     def owls_tick(self):
         owls_copy = copy.copy(self._owls)
-        #shuffle(owls_copy)
-        owls_copy.sort(key=lambda animal_elm: animal_elm._speed, reverse=True)
+        shuffle(owls_copy)
         for owl in owls_copy:
             if owl._alive:
                 owl.action()

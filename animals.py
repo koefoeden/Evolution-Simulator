@@ -117,6 +117,9 @@ class Owl(Animal):
         self._preg_time = Variables.owl_preg_time
         self._max_age = Variables.owl_max_age
 
+    def check_for_death(self):
+        pass
+
     def action(self):
         x, y = self._position
         self._time_since_eaten += 1
@@ -147,20 +150,43 @@ class Owl(Animal):
             if mouse_x_y != (-1, -1):
                 x, y = mouse_x_y
                 mouse_near = self._environment_instance._fields[y][x]
-                if mouse_near._speed <= self._speed:
-                    mouse_near._alive = False
-                    self._environment_instance._mice_alive -= 1
-                    self._time_since_eaten = 0
-                    self._environment_instance.animal_move_to(self, mouse_x_y)
 
-                else:
-                    mouse_near.action()
-                    mouse_near._has_moved = True
-                    if mouse_near._position == mouse_x_y:
+                if Variables.rand_catch:
+                    mouse_to_owl_speed_ratio = round(mouse_near._speed/self._speed)
+                    if mouse_to_owl_speed_ratio < 1:
+                        mouse_to_owl_speed_ratio = 1
+                    rand_int = randint(1, mouse_to_owl_speed_ratio)
+                    if rand_int == 1:
                         mouse_near._alive = False
                         self._environment_instance._mice_alive -= 1
                         self._time_since_eaten = 0
-                    self._environment_instance.animal_move_to(self, mouse_x_y)
+                        self._environment_instance.animal_move_to(self, mouse_x_y)
+
+                    else:
+                        mouse_near.action()
+                        mouse_near._has_moved = True
+
+                        if mouse_near._position == mouse_x_y:
+                            mouse_near._alive = False
+                            self._environment_instance._mice_alive -= 1
+                            self._time_since_eaten = 0
+                        self._environment_instance.animal_move_to(self, mouse_x_y)
+
+                else:
+                    if mouse_near._speed <= self._speed:
+                        mouse_near._alive = False
+                        self._environment_instance._mice_alive -= 1
+                        self._time_since_eaten = 0
+                        self._environment_instance.animal_move_to(self, mouse_x_y)
+
+                    else:
+                        mouse_near.action()
+                        mouse_near._has_moved = True
+                        if mouse_near._position == mouse_x_y:
+                            mouse_near._alive = False
+                            self._environment_instance._mice_alive -= 1
+                            self._time_since_eaten = 0
+                        self._environment_instance.animal_move_to(self, mouse_x_y)
 
             else:
                 self._environment_instance.animal_move_to(self, near_x_y)

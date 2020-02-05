@@ -2,14 +2,17 @@ class Variables:
     # moving
     dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0,0)]
 
+    # mechanics:
+    rand_catch = True
+
     # mice
     mouse_die_of_hunger = 0 # TODO: implement functionality
     mouse_preg_time = 2
     mouse_max_age = 0
 
     # owls
-    owl_die_of_hunger = 0
-    owl_preg_time = 0
+    owl_die_of_hunger = 5
+    owl_preg_time = 15
     owl_max_age = 0
 
     # inheritance
