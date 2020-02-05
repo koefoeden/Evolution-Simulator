@@ -3,7 +3,7 @@ class Variables:
     dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0,0)]
 
     # mechanics:
-    rand_catch = False
+    rand_catch = True
 
     # mice
     mouse_die_of_hunger = 0 # TODO: implement functionality
@@ -11,7 +11,7 @@ class Variables:
     mouse_max_age = 0
 
     # owls
-    owl_die_of_hunger = 5
+    owl_die_of_hunger = 4
     owl_preg_time = 15
     owl_max_age = 0
 

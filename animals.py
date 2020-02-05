@@ -11,7 +11,6 @@ class Animal:
 
     def __init__(self, x_y: Tuple[int, int], parents, env):
         self._position = x_y
-        self._alive = True
         self._is_pregnant = False
         self._is_pregnant_with = None
         self._time_pregnant = 0
@@ -31,9 +30,9 @@ class Animal:
 
     def __str__(self):
         if self._is_pregnant:
-            return colored(str(self._speed).zfill(environment.Environment.empty_field_spaces - 1), self._color, attrs=['underline'])
+            return colored(str(self._speed).zfill(environment.Environment.empty_field_spaces - 1), self._color, attrs=['underline'])+" "
         else:
-            return colored(str(self._speed).zfill(environment.Environment.empty_field_spaces - 1), self._color)
+            return colored(str(self._speed).zfill(environment.Environment.empty_field_spaces - 1), self._color)+" "
 
     def inherit(self, trait):
         if trait == "speed":
@@ -46,6 +45,12 @@ class Animal:
         rand_trait_contribution = (mean_parent_trait/100)*rand_variance_int
 
         return int(mean_parent_trait + rand_trait_contribution)
+
+    def is_dead_action(self):
+        if (self._time_since_eaten == self._die_of_hunger and self._die_of_hunger != 0) or \
+                (self._age == self._max_age and self._max_age != 0):
+            self.mark_as_dead()
+            return True
 
 
 class Mouse(Animal):
@@ -69,42 +74,35 @@ class Mouse(Animal):
         self._env.clear_field(self)
 
     def action(self):
-        if not self._has_moved:
-            x, y = self._position
-            self._age += 1
-            self._time_since_eaten += 1  # TODO: Implementation
+        self._has_moved = True
+        x, y = self._position
+        self._age += 1
+        self._time_since_eaten += 1  # TODO: Implementation
 
-            # Check for death conditions (death of age).
-            if self._age == self._max_age and self._max_age != 0:
-                self._alive = False
-                self._env._mice_alive -= 1
-                self._env.clear_field(self)
+        # Check for death conditions (death of age).
+        if not self.is_dead_action():
+            if self._is_pregnant:  # add pregnant time.
+                self._time_pregnant += 1
+
+            # check for nearby owl
+            owl_x_y = self._env.get_adj_tile_for(self, "withOwl")
+            if owl_x_y:
+                run_x_y = self._env.get_adj_tile_for(self, "run")
+                if run_x_y:
+                    self._env.animal_move_to(self, run_x_y)
                 return
 
-            # Otherwise, do something
-            else:
-                if self._is_pregnant:  # add pregnant time.
-                    self._time_pregnant += 1
+            # Check for empty space nearby.
+            near_x_y = self._env.get_adj_tile_for(self, "empty")
+            if near_x_y and near_x_y != (x, y):
+                if self._time_pregnant >= self._preg_time != 0:  # if time to baby
+                    self._env.add_animal_at("mouse", near_x_y, parents=[self, self._is_pregnant_with])
+                    self._time_pregnant = 0
+                    self._is_pregnant = False
+                    self._is_pregnant_with = None
 
-                # check for nearby owl
-                owl_x_y = self._env.get_adj_tile_for(self, "withOwl")
-                if owl_x_y != (-1, -1):
-                    run_x_y = self._env.get_adj_tile_for(self, "run")
-                    if run_x_y != (-1, -1):
-                        self._env.animal_move_to(self, run_x_y)
-                    return
-
-                # Check for empty space nearby.
-                near_x_y = self._env.get_adj_tile_for(self, "empty")
-                if near_x_y != (-1, -1) and near_x_y != (x, y):
-                    if self._time_pregnant >= self._preg_time != 0:  # if time to baby
-                        self._env.add_animal_at("mouse", near_x_y, parents=[self, self._is_pregnant_with])
-                        self._time_pregnant = 0
-                        self._is_pregnant = False
-                        self._is_pregnant_with = None
-
-                    else:
-                        self._env.animal_move_to(self, near_x_y)
+                else:
+                    self._env.animal_move_to(self, near_x_y)
 
 
 class Owl(Animal):
@@ -127,29 +125,24 @@ class Owl(Animal):
         self._env._owls_alive -= 1
         self._env.clear_field(self)
 
-    def is_dead_action(self):
-        if (self._time_since_eaten == self._die_of_hunger and self._die_of_hunger != 0) or (self._age == self._max_age and self._max_age != 0):
-            self.mark_as_dead()
-            return True
 
     def is_birth_time_action(self, x, y, near_x_y):
-        if self._time_pregnant >= self._preg_time != 0:  # if time to baby
-            if near_x_y != (-1, -1) and near_x_y != (x, y):
-                self._env.add_animal_at("owl", near_x_y)
-                self._time_pregnant = 0
-                self._is_pregnant = False
-                self._is_pregnant_with = None
-                return True
+        if self._time_pregnant >= self._preg_time != 0 and near_x_y and near_x_y != (x, y):
+            self._env.add_animal_at("owl", near_x_y)
+            self._time_pregnant = 0
+            self._is_pregnant = False
+            self._is_pregnant_with = None
+            return True
 
     def find_mouse_action(self):
         mouse_x_y = self._env.get_adj_tile_for(self, "withMouse")
 
-        if mouse_x_y != (-1, -1):
+        if mouse_x_y:
             x, y = mouse_x_y
             mouse_near = self._env._fields[y][x]
 
             if Variables.rand_catch:
-                mouse_to_owl_speed_ratio = round(mouse_near._speed / self._speed)
+                mouse_to_owl_speed_ratio = round(mouse_near._speed/self._speed)
                 if mouse_to_owl_speed_ratio < 1:
                     mouse_to_owl_speed_ratio = 1
                 rand_int = randint(1, mouse_to_owl_speed_ratio)
@@ -161,8 +154,6 @@ class Owl(Animal):
 
                 else:
                     mouse_near.action()
-                    mouse_near._has_moved = True
-
                     if mouse_near._position == mouse_x_y:
                         mouse_near.mark_as_dead()
                         self._time_since_eaten = 0
@@ -178,7 +169,6 @@ class Owl(Animal):
 
                 else:
                     mouse_near.action()
-                    mouse_near._has_moved = True
                     if mouse_near._position == mouse_x_y:
                         mouse_near.mark_as_dead()
                         self._time_since_eaten = 0
@@ -186,6 +176,7 @@ class Owl(Animal):
                     return True
 
     def action(self):
+        self._has_moved = True
         x, y = self._position
         self._time_since_eaten += 1
         self._age += 1

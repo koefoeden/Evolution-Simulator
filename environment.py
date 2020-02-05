@@ -5,11 +5,6 @@ from random import shuffle
 from typing import Tuple
 import copy
 from termcolor import colored
-import time
-from os import system, name
-#import colorama
-
-#colorama.init()
 
 
 def restart_cursor():
@@ -20,25 +15,34 @@ def clear_screen():
     print("\x1b[2J")
 
 
+class Grass:
+    def __str__(self):
+        #return colored("".ljust(Environment.empty_field_spaces-1), on_color='on_green')+""
+        return colored("MMM".ljust(Environment.empty_field_spaces-1), color='green')+" "
+
+class Rock:
+    def __str__self(self):
+        return
+
+
 class Environment:
     empty_field_spaces = 4
 
     def __init__(self, n, m, o, t=1000):
-        self._empty_field = ' '*3
-        self._n = n
-        self._mice = []
-        self._owls = []
-        self._animals = []
-        self._sleep_time = Variables.sleep_time
-        self._tick_no = 0
-
-        self._fields = [[self._empty_field for x in range(n)] for y in range(n)]
-        self._mice_alive = 0
-        self._owls_alive = 0
-
         self._ticks = t
         self._start_mice = m
         self._start_owls = o
+
+        self._empty_field = ' '*3 + " "
+        self._n = n
+        self._mice = []
+        self._owls = []
+        self._tick_no = 0
+
+        #new_grass = Grass()
+        self._fields = [[Grass() for x in range(n)] for y in range(n)]
+        self._mice_alive = 0
+        self._owls_alive = 0
 
         # INITIALIZE
         self.add_animals()
@@ -48,14 +52,12 @@ class Environment:
         if animal == "mouse":
             new_mouse = animals.Mouse(x_y, parents, self)
             self._mice.append(new_mouse)
-            self._animals.append(new_mouse)
             self._fields[y][x] = new_mouse
             self._mice_alive += 1
 
         if animal == "owl":
             new_owl = animals.Owl(x_y, parents, self)
             self._owls.append(new_owl)
-            self._animals.append(new_owl)
             self._fields[y][x] = new_owl
             self._owls_alive += 1
 
@@ -85,7 +87,7 @@ class Environment:
         # Recursive function to try one direction at a time.
         def try_dir(dir_options_input):
             if dir_options_input == []: #base-case
-                return (-1,-1)
+                return None
             else:
                 chosen_dir = dir_options_input.pop()
                 candidate_tile = tuple(map(sum, zip(animal._position, chosen_dir)))
@@ -124,13 +126,8 @@ class Environment:
         return try_dir(dir_options_call)
 
     def animal_move_to(self, animal, x_y: Tuple[int, int]):
-        # Clear field
         self.clear_field(animal)
-
-        # Update animals coordinates
         animal._position = x_y
-
-        # Update field
         x, y = x_y
         self._fields[y][x] = animal
 
@@ -142,39 +139,39 @@ class Environment:
         owls_copy = copy.copy(self._owls)
         shuffle(owls_copy)
         for owl in owls_copy:
-            if owl._alive:
-                owl.action()
-                owl._has_moved = True
+            owl.action()
 
     def mice_tick(self):
         mice_copy = copy.copy(self._mice)
         #shuffle(mice_copy)
         mice_copy.sort(key=lambda animal_elm: animal_elm._speed, reverse=True)
         for mouse in mice_copy:
-            if mouse._alive and not mouse._has_moved:
+            if not mouse._has_moved:
                 mouse.action()
-                mouse._has_moved = True
 
     def update_pregnancies(self):
-        animals_copy = copy.copy(self._animals)
-        shuffle(animals_copy)
+        for owl in self._owls:
+            if owl._sex == 'female' and not owl._is_pregnant:
+                male_near_x_y = self.get_adj_tile_for(owl, "withMaleOwl")
+                if male_near_x_y:
+                    x, y = male_near_x_y
+                    owl._is_pregnant = True
+                    owl._is_pregnant_with = self._fields[y][x]
 
-        for animal in animals_copy:
-            if animal._alive and animal._sex == 'female' and not animal._is_pregnant:
-                if isinstance(animal, animals.Mouse):
-                    male_near_x_y = self.get_adj_tile_for(animal, "withMaleMouse")
-                else:
-                    male_near_x_y = self.get_adj_tile_for(animal, "withMaleOwl")
-                x, y = male_near_x_y
-
-                if male_near_x_y != (-1, -1):
-                    animal._is_pregnant = True
-                    animal._is_pregnant_with = self._fields[y][x]
+        for mouse in self._mice:
+            if mouse._sex == 'female' and not mouse._is_pregnant:
+                male_near_x_y = self.get_adj_tile_for(mouse, "withMaleMouse")
+                if male_near_x_y:
+                    x, y = male_near_x_y
+                    mouse._is_pregnant = True
+                    mouse._is_pregnant_with = self._fields[y][x]
 
     def reset_moves(self):
-        for animal in self._animals:
-            if animal._alive:
-                animal._has_moved = False
+        for mouse in self._mice:
+            mouse._has_moved = False
+
+        for owl in self._owls:
+            owl._has_moved = False
 
     def tick(self):
         self.owls_tick()
@@ -189,6 +186,7 @@ class Environment:
 
         for mouse in self._mice:
             total_speed_mice += mouse._speed
+
         for owl in self._owls:
             total_speed_owls += owl._speed
 
@@ -207,12 +205,12 @@ class Environment:
     def print_board(self):
         print("    ", end='')
         for i in range(self._n):
-            print("{:^5}".format(i), end='')
+            print("{:^4}".format(i), end='')
         print()
         for i, row in enumerate(self._fields):
             print("{:^3}".format(i), end=' ')
             for item in row:
-                print("["+str(item)+"]", end='')
+                print(str(item), end='')
             print()
 
     def print_info_and_board(self):
