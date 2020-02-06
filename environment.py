@@ -1,7 +1,7 @@
 import animals
 from variables import Variables
 
-from random import shuffle
+from random import shuffle, randint
 from typing import Tuple
 import copy
 from termcolor import colored
@@ -15,14 +15,27 @@ def clear_screen():
     print("\x1b[2J")
 
 
-class Grass:
-    def __str__(self):
-        #return colored("".ljust(Environment.empty_field_spaces-1), on_color='on_green')+""
-        return colored("MMM".ljust(Environment.empty_field_spaces-1), color='green')+" "
+class Tile:
+    def __init__(self):
+        rand_int = randint(1, 100)
+        if rand_int <= Variables.rock_chance:
+            self._rock = True
+        else:
+            self._rock = False
 
-class Rock:
-    def __str__self(self):
-        return
+        self._animal = None
+        self._grass = True
+        self._time_since_grass_eaten = 0
+
+    def __str__(self):
+        if self._rock:
+            return colored("[-]".ljust(Environment.empty_field_spaces - 1), color='white') + " "
+        elif self._animal and self._grass:
+            return colored(self._animal.__str__(), on_color='on_green')
+        elif self._animal:
+            return self._animal.__str__()
+        else:
+            return colored("MMM".ljust(Environment.empty_field_spaces - 1), color='green', on_color='on_green') + " "
 
 
 class Environment:
@@ -39,8 +52,7 @@ class Environment:
         self._owls = []
         self._tick_no = 0
 
-        #new_grass = Grass()
-        self._fields = [[Grass() for x in range(n)] for y in range(n)]
+        self._fields = [[Tile() for x in range(n)] for y in range(n)]
         self._mice_alive = 0
         self._owls_alive = 0
 

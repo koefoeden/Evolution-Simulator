@@ -142,11 +142,9 @@ class Owl(Animal):
             mouse_near = self._env._fields[y][x]
 
             if Variables.rand_catch:
-                mouse_to_owl_speed_ratio = round(mouse_near._speed/self._speed)
-                if mouse_to_owl_speed_ratio < 1:
-                    mouse_to_owl_speed_ratio = 1
-                rand_int = randint(1, mouse_to_owl_speed_ratio)
-                if rand_int == 1:
+                owl_to_mouse_speed_percentage = round(100*(self._speed/mouse_near._speed))
+                rand_int = randint(1, 100)
+                if rand_int <= owl_to_mouse_speed_percentage:
                     mouse_near.mark_as_dead()
                     self._time_since_eaten = 0
                     self._env.animal_move_to(self, mouse_x_y)

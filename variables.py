@@ -1,4 +1,7 @@
 class Variables:
+    # environment
+    rock_chance = 10
+    grass_grow_back = 3
     # moving
     dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0,0)]
 
@@ -21,7 +24,6 @@ class Variables:
     inherit_preg_time = False
     inherit_max_age = False
     inherit_speed = True
-
 
     # tick time:
     sleep_time = 0.5
