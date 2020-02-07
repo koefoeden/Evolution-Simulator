@@ -11,8 +11,8 @@ from os import system, name
 if __name__ == '__main__':
     system('color')
     #object_environment = environment.Environment(n=20, m=100, o=20)  # good with no owl replication, mouse pregtime 2.
-    #object_environment = environment.Environment(n=5, m=5, o=2)
-    object_environment = environment.Environment(n=15, m=90, o=15)
+    object_environment = environment.Environment(n=10, m=20, o=0)
+    #object_environment = environment.Environment(n=15, m=90, o=15)
     object_environment.print_initial_tick()
 
     if Variables.keyboard_mode:

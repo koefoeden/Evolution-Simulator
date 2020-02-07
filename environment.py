@@ -17,36 +17,33 @@ def clear_screen():
 
 class Tile:
     def __init__(self):
-        rand_int = randint(1, 100)
-        if rand_int <= Variables.rock_chance:
-            self._rock = True
-        else:
-            self._rock = False
-
+        self._rock = False
         self._animal = None
-        self._grass = True
+        self._grass = False
         self._time_since_grass_eaten = 0
 
     def __str__(self):
         if self._rock:
-            return colored("[-]".ljust(Environment.empty_field_spaces - 1), color='white') + " "
+            return colored("[-]", color='white') + " "
         elif self._animal and self._grass:
             return colored(self._animal.__str__(), on_color='on_green')
-        elif self._animal:
+        elif self._animal and not self._grass:
             return self._animal.__str__()
+        elif not self._animal and self._grass:
+            return colored("MMM", color='green') + " "
         else:
-            return colored("MMM".ljust(Environment.empty_field_spaces - 1), color='green', on_color='on_green') + " "
+            return Environment._empty_field
 
 
 class Environment:
     empty_field_spaces = 4
+    _empty_field = ' '*3 + " "
 
     def __init__(self, n, m, o, t=1000):
         self._ticks = t
         self._start_mice = m
         self._start_owls = o
 
-        self._empty_field = ' '*3 + " "
         self._n = n
         self._mice = []
         self._owls = []
@@ -58,19 +55,24 @@ class Environment:
 
         # INITIALIZE
         self.add_animals()
+        self.add_grass_and_rocks()
 
     def add_animal_at(self, animal: str, x_y: Tuple[int, int], parents=None):
         x, y = x_y
         if animal == "mouse":
             new_mouse = animals.Mouse(x_y, parents, self)
             self._mice.append(new_mouse)
-            self._fields[y][x] = new_mouse
+            self._fields[y][x]._animal = new_mouse
+            self._fields[y][x]._grass = False
+            self._fields[y][x]._time_since_grass_eaten = 0
             self._mice_alive += 1
 
         if animal == "owl":
             new_owl = animals.Owl(x_y, parents, self)
             self._owls.append(new_owl)
-            self._fields[y][x] = new_owl
+            self._fields[y][x]._animal = new_owl
+            self._fields[y][x]._grass = False
+            self._fields[y][x]._time_since_grass_eaten = 0
             self._owls_alive += 1
 
     def add_animals(self):
@@ -82,6 +84,17 @@ class Environment:
 
         for i2 in range(self._start_mice, self._start_mice + self._start_owls):
             self.add_animal_at("owl", possibilities[i2])
+
+    def add_grass_and_rocks(self):
+        for row in self._fields:
+            for tile in row:
+                if not tile._animal:
+                    rand_int = randint(1, 100)
+                    if rand_int <= Variables.rock_chance:
+                        tile._rock = True
+                    else:
+                        tile._grass = True
+
 
     def is_legal_field(self, x_y: Tuple[int, int]):
         x, y = x_y
@@ -108,29 +121,38 @@ class Environment:
                 if self.is_legal_field(candidate_tile):
 
                     if tile_req == "empty":
-                        if self.is_empty_field(candidate_tile) or self._fields[y_cand][x_cand] == animal:
+                        if not self._fields[y_cand][x_cand]._rock:
+                            if not self._fields[y_cand][x_cand]._animal or self._fields[y_cand][x_cand]._animal == animal:
+                                return candidate_tile
+
+                    if tile_req == "nonSelfEmpty":
+                        if not self._fields[y_cand][x_cand]._rock  and not self._fields[y_cand][x_cand]._animal:
+                            return candidate_tile
+
+                    elif tile_req == "withGrass":
+                        if self._fields[y_cand][x_cand]._grass == True:
                             return candidate_tile
 
                     elif tile_req == "withMouse":
-                        if isinstance(self._fields[y_cand][x_cand], animals.Mouse):
+                        if isinstance(self._fields[y_cand][x_cand]._animal, animals.Mouse):
                             return candidate_tile
 
                     elif tile_req == "withOwl":
-                        if isinstance(self._fields[y_cand][x_cand], animals.Owl):
+                        if isinstance(self._fields[y_cand][x_cand]._animal, animals.Owl):
                             return candidate_tile
 
                     elif tile_req == "run":
-                        if self.is_empty_field(candidate_tile):
+                        if not self._fields[y_cand][x_cand]._rock  and not self._fields[y_cand][x_cand]._animal:
                             return candidate_tile
 
                     elif tile_req == "withMaleMouse":
-                        if isinstance(self._fields[y_cand][x_cand], animals.Mouse):
-                            if self._fields[y_cand][x_cand]._sex == "male":
+                        if isinstance(self._fields[y_cand][x_cand]._animal, animals.Mouse):
+                            if self._fields[y_cand][x_cand]._animal._sex == "male":
                                 return candidate_tile
 
                     elif tile_req == "withMaleOwl":
-                        if isinstance(self._fields[y_cand][x_cand], animals.Owl):
-                            if self._fields[y_cand][x_cand]._sex == "male":
+                        if isinstance(self._fields[y_cand][x_cand]._animal, animals.Owl):
+                            if self._fields[y_cand][x_cand]._animal._sex == "male":
                                 return candidate_tile
 
                 return try_dir(dir_options_input)
@@ -141,11 +163,16 @@ class Environment:
         self.clear_field(animal)
         animal._position = x_y
         x, y = x_y
-        self._fields[y][x] = animal
+        self._fields[y][x]._animal = animal
+        if isinstance(animal, animals.Mouse):
+            if self._fields[y][x]._grass:
+                self._fields[y][x]._grass = False
+                self._fields[y][x]._time_since_grass_eaten = 0
+                animal._time_since_eaten = 0
 
     def clear_field(self, animal):
         x, y = animal._position
-        self._fields[y][x] = self._empty_field
+        self._fields[y][x]._animal = None
 
     def owls_tick(self):
         owls_copy = copy.copy(self._owls)
@@ -168,7 +195,7 @@ class Environment:
                 if male_near_x_y:
                     x, y = male_near_x_y
                     owl._is_pregnant = True
-                    owl._is_pregnant_with = self._fields[y][x]
+                    owl._is_pregnant_with = self._fields[y][x]._animal
 
         for mouse in self._mice:
             if mouse._sex == 'female' and not mouse._is_pregnant:
@@ -176,7 +203,7 @@ class Environment:
                 if male_near_x_y:
                     x, y = male_near_x_y
                     mouse._is_pregnant = True
-                    mouse._is_pregnant_with = self._fields[y][x]
+                    mouse._is_pregnant_with = self._fields[y][x]._animal
 
     def reset_moves(self):
         for mouse in self._mice:
@@ -185,11 +212,20 @@ class Environment:
         for owl in self._owls:
             owl._has_moved = False
 
+    def grow_grass(self):
+        for row in self._fields:
+            for tile in row:
+                if not tile._rock:
+                    tile._time_since_grass_eaten += 1
+                    if tile._time_since_grass_eaten == Variables.grass_grow_back:
+                        tile._grass = True
+
     def tick(self):
         self.owls_tick()
         self.mice_tick()
         self.update_pregnancies()
         self.reset_moves()
+        self.grow_grass()
         self._tick_no += 1
 
     def average_speed(self):

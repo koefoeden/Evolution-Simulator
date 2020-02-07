@@ -1,15 +1,15 @@
 class Variables:
     # environment
-    rock_chance = 10
-    grass_grow_back = 3
+    rock_chance = 20
+    grass_grow_back = 10
     # moving
-    dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0,0)]
+    dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]
 
     # mechanics:
     rand_catch = True
 
     # mice
-    mouse_die_of_hunger = 0 # TODO: implement functionality
+    mouse_die_of_hunger = 7
     mouse_preg_time = 2
     mouse_max_age = 0
 

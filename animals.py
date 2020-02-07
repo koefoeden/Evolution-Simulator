@@ -1,7 +1,7 @@
 import environment
 from variables import Variables
 
-from random import randint
+from random import randint, shuffle
 from typing import Tuple
 from termcolor import colored
 
@@ -52,6 +52,34 @@ class Animal:
             self.mark_as_dead()
             return True
 
+    def get_adj_legal_tiles(self):
+        x, y = self._position
+        adj_legal_coordinates = [(x+x_move, y+y_move) for x_move, y_move in Variables.dir_options if x+x_move >= 0 and y+y_move >= 0]
+        adj_legal_tiles = [self._env._fields[y][x] for x, y in adj_legal_coordinates if not self._env._fields[y][x]._rock]
+        shuffle(adj_legal_tiles)
+        return adj_legal_tiles
+
+    def get_owl_tiles(self, adj_tiles):
+        return [tile for tile in adj_tiles if isinstance(tile._animal, Owl)]
+
+    def get_male_owl_tiles(self, adj_tiles):
+        return [tile for tile in adj_tiles if isinstance(tile._animal, Owl) and tile._animal._sex == "male"]
+
+    def get_mouse_tiles(self, adj_tiles):
+        return [tile for tile in adj_tiles if isinstance(tile._animal, Mouse)]
+
+    def get_male_mouse_tiles(self, adj_tiles):
+        return [tile for tile in adj_tiles if isinstance(tile._animal, Mouse) and tile._animal._sex == "male"]
+
+    def get_empty_tiles(self, adj_tiles):
+        return [tile for tile in adj_tiles if not tile._animal]
+
+    def get_move_tiles(self, adj_tiles):
+        return [tile for tile in adj_tiles if not tile._animal or tile._animal == self]
+
+    def get_grass_tiles(self, adj_tiles):
+        return [tile for tile in adj_tiles if tile._grass and (not tile._animal or tile._animal == self)]
+
 
 class Mouse(Animal):
     ID = 0
@@ -74,35 +102,50 @@ class Mouse(Animal):
         self._env.clear_field(self)
 
     def action(self):
-        self._has_moved = True
-        x, y = self._position
-        self._age += 1
-        self._time_since_eaten += 1  # TODO: Implementation
+        if not self._has_moved:
+            self._has_moved = True
+            x, y = self._position
+            self._age += 1
+            self._time_since_eaten += 1  #
 
-        # Check for death conditions (death of age).
-        if not self.is_dead_action():
-            if self._is_pregnant:  # add pregnant time.
-                self._time_pregnant += 1
+            # Check for death conditions (death of age).
+            if not self.is_dead_action():
+                if self._is_pregnant:  # add pregnant time.
+                    self._time_pregnant += 1
 
-            # check for nearby owl
-            owl_x_y = self._env.get_adj_tile_for(self, "withOwl")
-            if owl_x_y:
-                run_x_y = self._env.get_adj_tile_for(self, "run")
-                if run_x_y:
-                    self._env.animal_move_to(self, run_x_y)
-                return
+                #ajd_tiles = self.get_adj_tiles()
+                #for tile in adj_tiles:
+                 #   if tile._animal == animals.Owl:
+                  #pass
 
-            # Check for empty space nearby.
-            near_x_y = self._env.get_adj_tile_for(self, "empty")
-            if near_x_y and near_x_y != (x, y):
-                if self._time_pregnant >= self._preg_time != 0:  # if time to baby
-                    self._env.add_animal_at("mouse", near_x_y, parents=[self, self._is_pregnant_with])
-                    self._time_pregnant = 0
-                    self._is_pregnant = False
-                    self._is_pregnant_with = None
+                # check for nearby owl
+                owl_x_y = self._env.get_adj_tile_for(self, "withOwl")
+                if owl_x_y:
+                    run_x_y = self._env.get_adj_tile_for(self, "run")
+                    if run_x_y:
+                        self._env.animal_move_to(self, run_x_y)
+                    return
+
+                # Check for empty space nearby.
+                near_x_y_non_self = self._env.get_adj_tile_for(self, "nonSelfEmpty")
+                if near_x_y_non_self:
+                    if self._time_pregnant >= self._preg_time != 0:  # if time to baby
+                        self._env.add_animal_at("mouse", near_x_y_non_self, parents=[self, self._is_pregnant_with])
+                        self._time_pregnant = 0
+                        self._is_pregnant = False
+                        self._is_pregnant_with = None
+                        return
+
+                near_x_y_grass = self._env.get_adj_tile_for(self, "withGrass")
+                if near_x_y_grass:
+                    self._env.animal_move_to(self, near_x_y_grass)
 
                 else:
-                    self._env.animal_move_to(self, near_x_y)
+                    near_x_y = self._env.get_adj_tile_for(self, "empty")
+                    if near_x_y:
+                        self._env.animal_move_to(self, near_x_y)
+                    else:
+                        self._env.animal_move_to(self, (x, y))
 
 
 class Owl(Animal):
@@ -139,7 +182,7 @@ class Owl(Animal):
 
         if mouse_x_y:
             x, y = mouse_x_y
-            mouse_near = self._env._fields[y][x]
+            mouse_near = self._env._fields[y][x]._animal
 
             if Variables.rand_catch:
                 owl_to_mouse_speed_percentage = round(100*(self._speed/mouse_near._speed))
