@@ -214,7 +214,7 @@ class Owl(Animal):
                     return True
 
     def action(self):
-        self._has_moved = True
+        #self._has_moved = True
         self._time_since_eaten += 1
         self._age += 1
 

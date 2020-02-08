@@ -98,65 +98,6 @@ class Environment:
         x, y = x_y
         return (x >= 0) and (y >= 0) and (x < self._n) and (y < self._n)
 
-    def is_empty_field(self, x_y: Tuple[int, int]):
-        x, y = x_y
-        return self._fields[y][x] == self._empty_field
-    """
-    def get_adj_tile_for(self, animal, tile_req: str):
-        # Initialize: Shuffling and copying
-        dir_options_call = copy.copy(Variables.dir_options)
-        shuffle(dir_options_call)
-
-        # Recursive function to try one direction at a time.
-        def try_dir(dir_options_input):
-            if dir_options_input == []: #base-case
-                return None
-            else:
-                chosen_dir = dir_options_input.pop()
-                candidate_tile = tuple(map(sum, zip(animal._position, chosen_dir)))
-                x_cand, y_cand = candidate_tile
-
-                if self.is_legal_field(candidate_tile):
-
-                    if tile_req == "empty":
-                        if not self._fields[y_cand][x_cand]._rock:
-                            if not self._fields[y_cand][x_cand]._animal or self._fields[y_cand][x_cand]._animal == animal:
-                                return candidate_tile
-
-                    if tile_req == "nonSelfEmpty":
-                        if not self._fields[y_cand][x_cand]._rock  and not self._fields[y_cand][x_cand]._animal:
-                            return candidate_tile
-
-                    elif tile_req == "withGrass":
-                        if self._fields[y_cand][x_cand]._grass == True:
-                            return candidate_tile
-
-                    elif tile_req == "withMouse":
-                        if isinstance(self._fields[y_cand][x_cand]._animal, animals.Mouse):
-                            return candidate_tile
-
-                    elif tile_req == "withOwl":
-                        if isinstance(self._fields[y_cand][x_cand]._animal, animals.Owl):
-                            return candidate_tile
-
-                    elif tile_req == "run":
-                        if not self._fields[y_cand][x_cand]._rock  and not self._fields[y_cand][x_cand]._animal:
-                            return candidate_tile
-
-                    elif tile_req == "withMaleMouse":
-                        if isinstance(self._fields[y_cand][x_cand]._animal, animals.Mouse):
-                            if self._fields[y_cand][x_cand]._animal._sex == "male":
-                                return candidate_tile
-
-                    elif tile_req == "withMaleOwl":
-                        if isinstance(self._fields[y_cand][x_cand]._animal, animals.Owl):
-                            if self._fields[y_cand][x_cand]._animal._sex == "male":
-                                return candidate_tile
-
-                return try_dir(dir_options_input)
-
-        return try_dir(dir_options_call)
-    """
     def animal_move_to(self, animal, tile):
         self.clear_field(animal)
         animal._position = tile._position
@@ -179,7 +120,6 @@ class Environment:
 
     def mice_tick(self):
         mice_copy = copy.copy(self._mice)
-        #shuffle(mice_copy)
         mice_copy.sort(key=lambda animal_elm: animal_elm._speed, reverse=True)
         for mouse in mice_copy:
             if not mouse._has_moved:
@@ -204,8 +144,8 @@ class Environment:
         for mouse in self._mice:
             mouse._has_moved = False
 
-        for owl in self._owls:
-            owl._has_moved = False
+        # for owl in self._owls:
+        #     owl._has_moved = False
 
     def grow_grass(self):
         for row in self._fields:
