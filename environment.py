@@ -16,7 +16,8 @@ def clear_screen():
 
 
 class Tile:
-    def __init__(self):
+    def __init__(self, x, y):
+        self._position = (x, y)
         self._rock = False
         self._animal = None
         self._grass = False
@@ -39,17 +40,16 @@ class Environment:
     empty_field_spaces = 4
     _empty_field = ' '*3 + " "
 
-    def __init__(self, n, m, o, t=1000):
-        self._ticks = t
-        self._start_mice = m
-        self._start_owls = o
+    def __init__(self):
+        self._start_mice = Variables.mouse_number
+        self._start_owls = Variables.owl_number
 
-        self._n = n
+        self._n = Variables.dimensions
         self._mice = []
         self._owls = []
         self._tick_no = 0
 
-        self._fields = [[Tile() for x in range(n)] for y in range(n)]
+        self._fields = [[Tile(x, y) for x in range(self._n)] for y in range(self._n)]
         self._mice_alive = 0
         self._owls_alive = 0
 
@@ -57,26 +57,25 @@ class Environment:
         self.add_animals()
         self.add_grass_and_rocks()
 
-    def add_animal_at(self, animal: str, x_y: Tuple[int, int], parents=None):
-        x, y = x_y
+    def add_animal_at(self, animal: str, tile, parents=None):
         if animal == "mouse":
-            new_mouse = animals.Mouse(x_y, parents, self)
+            new_mouse = animals.Mouse(tile._position, parents, self)
             self._mice.append(new_mouse)
-            self._fields[y][x]._animal = new_mouse
-            self._fields[y][x]._grass = False
-            self._fields[y][x]._time_since_grass_eaten = 0
+            tile._animal = new_mouse
+            tile._animal._grass = False
+            tile._animal._time_since_grass_eaten = 0
             self._mice_alive += 1
 
         if animal == "owl":
-            new_owl = animals.Owl(x_y, parents, self)
+            new_owl = animals.Owl(tile._position, parents, self)
             self._owls.append(new_owl)
-            self._fields[y][x]._animal = new_owl
-            self._fields[y][x]._grass = False
-            self._fields[y][x]._time_since_grass_eaten = 0
+            tile._animal = new_owl
+            tile._animal._grass = False
+            tile._animal._time_since_grass_eaten = 0
             self._owls_alive += 1
 
     def add_animals(self):
-        possibilities = [(x, y) for x in range(self._n) for y in range(self._n)]
+        possibilities = [self._fields[y][x] for x in range(self._n) for y in range(self._n)]
         shuffle(possibilities)
 
         for i in range(self._start_mice):
@@ -159,15 +158,14 @@ class Environment:
 
         return try_dir(dir_options_call)
 
-    def animal_move_to(self, animal, x_y: Tuple[int, int]):
+    def animal_move_to(self, animal, tile):
         self.clear_field(animal)
-        animal._position = x_y
-        x, y = x_y
-        self._fields[y][x]._animal = animal
+        animal._position = tile._position
+        tile._animal = animal
         if isinstance(animal, animals.Mouse):
-            if self._fields[y][x]._grass:
-                self._fields[y][x]._grass = False
-                self._fields[y][x]._time_since_grass_eaten = 0
+            if tile._grass:
+                tile._grass = False
+                tile._time_since_grass_eaten = 0
                 animal._time_since_eaten = 0
 
     def clear_field(self, animal):
