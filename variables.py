@@ -3,6 +3,7 @@ class Variables_exp:
     dimensions = 10
     rock_chance = 20
     grass_grow_back = 5
+
     # moving
     dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]
 
@@ -41,6 +42,7 @@ class Variables:
     dimensions = 10
     rock_chance = 0
     grass_grow_back = 5
+
     # moving
     dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]
 

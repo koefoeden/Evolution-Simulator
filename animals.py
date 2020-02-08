@@ -21,6 +21,7 @@ class Animal:
         self._color = None
         self._env = env
         self._has_moved = False
+        self._adj_legal_tiles = self.get_adj_legal_tiles()
 
         # variables
         if parents and Variables.inherit_speed:
@@ -60,26 +61,26 @@ class Animal:
         shuffle(adj_legal_tiles)
         return adj_legal_tiles
 
-    def get_owl_tiles(self, adj_tiles):
-        return [tile for tile in adj_tiles if isinstance(tile._animal, Owl)]
+    def get_owl_tiles(self):
+        return [tile for tile in self._adj_legal_tiles if isinstance(tile._animal, Owl)]
 
-    def get_male_owl_tiles(self, adj_tiles):
-        return [tile for tile in adj_tiles if isinstance(tile._animal, Owl) and tile._animal._sex == "male"]
+    def get_male_owl_tiles(self):
+        return [tile for tile in self._adj_legal_tiles if isinstance(tile._animal, Owl) and tile._animal._sex == "male"]
 
-    def get_mouse_tiles(self, adj_tiles):
-        return [tile for tile in adj_tiles if isinstance(tile._animal, Mouse)]
+    def get_mouse_tiles(self):
+        return [tile for tile in self._adj_legal_tiles if isinstance(tile._animal, Mouse)]
 
-    def get_male_mouse_tiles(self, adj_tiles):
-        return [tile for tile in adj_tiles if isinstance(tile._animal, Mouse) and tile._animal._sex == "male"]
+    def get_male_mouse_tiles(self):
+        return [tile for tile in self._adj_legal_tiles if isinstance(tile._animal, Mouse) and tile._animal._sex == "male"]
 
-    def get_empty_tiles(self, adj_tiles):
-        return [tile for tile in adj_tiles if not tile._animal]
+    def get_empty_tiles(self):
+        return [tile for tile in self._adj_legal_tiles if not tile._animal]
 
-    def get_grass_tiles(self, adj_tiles):
-        return [tile for tile in adj_tiles if tile._grass and (not tile._animal or tile._animal == self)]
+    def get_grass_tiles(self):
+        return [tile for tile in self._adj_legal_tiles if tile._grass and (not tile._animal or tile._animal == self)]
 
-    def get_move_tiles(self, adj_tiles):
-        return [tile for tile in adj_tiles if not tile._animal or tile._animal == self]
+    def get_move_tiles(self):
+        return [tile for tile in self._adj_legal_tiles if not tile._animal or tile._animal == self]
 
 
 class Mouse(Animal):
@@ -113,11 +114,11 @@ class Mouse(Animal):
                 if self._is_pregnant:  # add pregnant time.
                     self._time_pregnant += 1
 
-                adj_legal_tiles = self.get_adj_legal_tiles()
-                empty_tiles = self.get_empty_tiles(adj_legal_tiles)
+                self._adj_legal_tiles = self.get_adj_legal_tiles()
+                empty_tiles = self.get_empty_tiles()
 
                 # Owl near action
-                if self.get_owl_tiles(adj_legal_tiles) and empty_tiles:
+                if self.get_owl_tiles() and empty_tiles:
                         self._env.animal_move_to(self, empty_tiles[0])
                         return
 
@@ -130,13 +131,13 @@ class Mouse(Animal):
                         return
 
                 # eat grass action
-                grass_tiles = self.get_grass_tiles(adj_legal_tiles)
+                grass_tiles = self.get_grass_tiles()
                 if grass_tiles:
                     self._env.animal_move_to(self, grass_tiles[0])
                     return
 
                 # final move action
-                move_tiles = self.get_move_tiles(adj_legal_tiles)
+                move_tiles = self.get_move_tiles()
                 if move_tiles:
                     self._env.animal_move_to(self, move_tiles[0])
                     return
@@ -170,14 +171,14 @@ class Owl(Animal):
             self._is_pregnant_with = None
             return True
 
-    def find_mouse_action(self, adj_tiles):
+    def find_mouse_action(self):
         # hunt mice action
-        mouse_tiles = self.get_mouse_tiles(adj_tiles)
+        mouse_tiles = self.get_mouse_tiles()
         if mouse_tiles:
             mouse_near = mouse_tiles[0]._animal
             mouse_near_position = mouse_near._position
 
-            #random catch ON
+            # random catch ON
             if Variables.rand_catch:
                 owl_to_mouse_speed_percentage = round(100*(self._speed/mouse_near._speed))
                 rand_int = randint(1, 100)
@@ -221,15 +222,15 @@ class Owl(Animal):
             if self._is_pregnant:  # add pregnant time.
                 self._time_pregnant += 1
 
-            adj_tiles = self.get_adj_legal_tiles()
-            empty_tiles = self.get_empty_tiles(adj_tiles)
+            self._adj_legal_tiles = self.get_adj_legal_tiles()
+            empty_tiles = self.get_empty_tiles()
 
             #birth action
             if not self.is_birth_time_action(empty_tiles):
                 #find mouse action
-                if not self.find_mouse_action(adj_tiles):
+                if not self.find_mouse_action():
 
                     #move action
-                    move_tiles = self.get_mouse_tiles(adj_tiles)
+                    move_tiles = self.get_mouse_tiles()
                     if move_tiles:
                         self._env.animal_move_to(self, move_tiles[0])

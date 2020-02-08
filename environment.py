@@ -94,7 +94,6 @@ class Environment:
                     else:
                         tile._grass = True
 
-
     def is_legal_field(self, x_y: Tuple[int, int]):
         x, y = x_y
         return (x >= 0) and (y >= 0) and (x < self._n) and (y < self._n)
@@ -102,7 +101,7 @@ class Environment:
     def is_empty_field(self, x_y: Tuple[int, int]):
         x, y = x_y
         return self._fields[y][x] == self._empty_field
-
+    """
     def get_adj_tile_for(self, animal, tile_req: str):
         # Initialize: Shuffling and copying
         dir_options_call = copy.copy(Variables.dir_options)
@@ -157,7 +156,7 @@ class Environment:
                 return try_dir(dir_options_input)
 
         return try_dir(dir_options_call)
-
+    """
     def animal_move_to(self, animal, tile):
         self.clear_field(animal)
         animal._position = tile._position
@@ -189,19 +188,17 @@ class Environment:
     def update_pregnancies(self):
         for owl in self._owls:
             if owl._sex == 'female' and not owl._is_pregnant:
-                male_near_x_y = self.get_adj_tile_for(owl, "withMaleOwl")
-                if male_near_x_y:
-                    x, y = male_near_x_y
+                male_tiles = owl.get_male_owl_tiles()
+                if male_tiles:
                     owl._is_pregnant = True
-                    owl._is_pregnant_with = self._fields[y][x]._animal
+                    owl._is_pregnant_with = male_tiles[0]._animal
 
         for mouse in self._mice:
             if mouse._sex == 'female' and not mouse._is_pregnant:
-                male_near_x_y = self.get_adj_tile_for(mouse, "withMaleMouse")
-                if male_near_x_y:
-                    x, y = male_near_x_y
+                male_tiles = mouse.get_male_mouse_tiles()
+                if male_tiles:
                     mouse._is_pregnant = True
-                    mouse._is_pregnant_with = self._fields[y][x]._animal
+                    mouse._is_pregnant_with = male_tiles[0]._animal
 
     def reset_moves(self):
         for mouse in self._mice:
