@@ -20,7 +20,11 @@ class Tile:
         self.rock = False
         self.animal = None
         self.grass = False
-        self.time_since_grass_eaten = 0
+
+        if Variables.in_medias_res:
+            self.time_since_grass_eaten = randint(0, Variables.grass_grow_back)
+        else:
+            self.time_since_grass_eaten = 0
 
     def __str__(self):
         if self.rock:
@@ -91,7 +95,11 @@ class Environment:
                     if rand_int <= Variables.rock_chance:
                         tile.rock = True
                     else:
-                        tile.grass = True
+                        if Variables.in_medias_res:
+                            if tile.time_since_grass_eaten == Variables.grass_grow_back:
+                                tile.grass = True
+                        else:
+                            tile.grass = True
 
     def is_legal_field(self, x_y: Tuple[int, int]):
         x, y = x_y
@@ -116,6 +124,7 @@ class Environment:
         shuffle(owls_copy)
         for owl in owls_copy:
             owl.action()
+            owl.post_action()
 
     def mice_tick(self):
         mice_copy = copy.copy(self.mice)
@@ -123,6 +132,7 @@ class Environment:
         for mouse in mice_copy:
             if not mouse.has_moved:
                 mouse.action()
+                mouse.post_action()
 
     def update_pregnancies(self):
         for owl in self.owls:

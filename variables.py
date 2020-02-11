@@ -1,4 +1,4 @@
-class VariablesExp:
+class Variables:
     # environment
     dimensions = 20
     rock_chance = 0
@@ -9,17 +9,18 @@ class VariablesExp:
 
     # mechanics:
     rand_catch = True
+    in_medias_res = True
 
     # mice
-    mouse_number = 130
+    mouse_number = 280
     mouse_die_of_hunger = 5
-    mouse_preg_time = 2
+    mouse_preg_time = 3
     mouse_max_age = 0
 
     # owls
-    owl_number = 15
-    owl_die_of_hunger = 10
-    owl_preg_time = 5
+    owl_number = 0
+    owl_die_of_hunger = 15
+    owl_preg_time = 4
     owl_max_age = 0
 
     # inheritance
@@ -30,14 +31,13 @@ class VariablesExp:
     inherit_speed = True
 
     # tick time:
-    sleep_time = 0.5
     slow_mode_sleep_time = 0.1
 
     # keyboard mode
     keyboard_mode = True
 
 
-class Variables:
+class Variables_exp:
     # environment
     dimensions = 10
     rock_chance = 0
@@ -48,6 +48,7 @@ class Variables:
 
     # mechanics:
     rand_catch = True
+    in_medias_res = True
 
     # mice
     mouse_number = 10

@@ -14,7 +14,6 @@ class Animal:
         self.is_pregnant_with = None
         self.time_pregnant = 0
         self.sex = Animal.sex_dict[randint(0, 1)]
-        self.time_since_eaten = 0
         self.age = 0
         self.parents = parents
         self.color = None
@@ -22,7 +21,19 @@ class Animal:
         self.has_moved = False
         self.adj_legal_tiles = self.get_adj_legal_tiles()
 
-        # variables
+        # variables assigning
+        if isinstance(self, Mouse):
+            self.die_of_hunger = Variables.mouse_die_of_hunger
+            self.preg_time = Variables.mouse_preg_time
+            self.max_age = Variables.mouse_max_age
+        else:
+            self.die_of_hunger = Variables.owl_die_of_hunger
+            self.preg_time = Variables.owl_preg_time
+            self.max_age = Variables.owl_max_age
+
+        self.time_since_eaten = randint(0, self.die_of_hunger-2)
+
+        # inheritance
         if parents and Variables.inherit_speed:
             self.speed = self.inherit_speed()
         else:
@@ -47,6 +58,11 @@ class Animal:
                 (self.age == self.max_age and self.max_age != 0):
             self.mark_as_dead()
             return True
+
+    def post_action(self):
+        self.has_moved = True
+        self.age += 1
+        self.time_since_eaten += 1
 
     def get_adj_legal_tiles(self):
         x_pos, y_pos = self.position
@@ -88,11 +104,6 @@ class Mouse(Animal):
         Mouse.ID += 1
         self.color = Mouse.sex_color_dict[self.sex]
 
-        # variables
-        self.die_of_hunger = Variables.mouse_die_of_hunger
-        self.preg_time = Variables.mouse_preg_time
-        self.max_age = Variables.mouse_max_age
-
     def mark_as_dead(self):
         self.env.mice.remove(self)
         self.env.mice_alive -= 1
@@ -100,10 +111,6 @@ class Mouse(Animal):
 
     def action(self):
         if not self.has_moved:
-            self.has_moved = True
-            self.age += 1
-            self.time_since_eaten += 1  #
-
             # Check for death conditions (death of age).
             if not self.is_dead_action():
                 if self.is_pregnant:  # add pregnant time.
@@ -117,18 +124,18 @@ class Mouse(Animal):
                     self.env.animal_move_to(self, empty_tiles[0])
                     return
 
-                # eat grass action
-                grass_tiles = self.get_grass_tiles()
-                if grass_tiles:
-                    self.env.animal_move_to(self, grass_tiles[0])
-                    return
-
-                    # Pregnancy action
+                # Pregnancy action
                 if empty_tiles and self.time_pregnant >= self.preg_time != 0:  # if time to baby
                     self.env.add_animal_at("mouse", empty_tiles[0], parents=[self, self.is_pregnant_with])
                     self.time_pregnant = 0
                     self.is_pregnant = False
                     self.is_pregnant_with = None
+                    return
+
+                # eat grass action
+                grass_tiles = self.get_grass_tiles()
+                if grass_tiles:
+                    self.env.animal_move_to(self, grass_tiles[0])
                     return
 
                 # final move action
@@ -147,11 +154,6 @@ class Owl(Animal):
         self.ID = Owl.ID
         Owl.ID += 1
         self.color = Owl.sex_color_dict[self.sex]
-
-        # variables
-        self.die_of_hunger = Variables.owl_die_of_hunger
-        self.preg_time = Variables.owl_preg_time
-        self.max_age = Variables.owl_max_age
 
     def mark_as_dead(self):
         self.env.owls.remove(self)
@@ -209,10 +211,6 @@ class Owl(Animal):
                     return True
 
     def action(self):
-        # self.has_moved = True
-        self.time_since_eaten += 1
-        self.age += 1
-
         if not self.is_dead_action():
             if self.is_pregnant:  # add pregnant time.
                 self.time_pregnant += 1
@@ -220,11 +218,9 @@ class Owl(Animal):
             self.adj_legal_tiles = self.get_adj_legal_tiles()
             empty_tiles = self.get_empty_tiles()
 
-            # birth action
             if not self.is_birth_time_action(empty_tiles):
                 # find mouse action
                 if not self.find_mouse_action():
-
                     # move action
                     move_tiles = self.get_empty_tiles()
                     if move_tiles:
