@@ -1,7 +1,7 @@
-class Variables_exp:
+class VariablesExp:
     # environment
-    dimensions = 10
-    rock_chance = 20
+    dimensions = 20
+    rock_chance = 0
     grass_grow_back = 5
 
     # moving
@@ -11,15 +11,15 @@ class Variables_exp:
     rand_catch = True
 
     # mice
-    mouse_number = 10
+    mouse_number = 130
     mouse_die_of_hunger = 5
-    mouse_preg_time = 1
+    mouse_preg_time = 2
     mouse_max_age = 0
 
     # owls
-    owl_number = 5
-    owl_die_of_hunger = 8
-    owl_preg_time = 4
+    owl_number = 15
+    owl_die_of_hunger = 10
+    owl_preg_time = 5
     owl_max_age = 0
 
     # inheritance
@@ -52,7 +52,7 @@ class Variables:
     # mice
     mouse_number = 10
     mouse_die_of_hunger = 5
-    mouse_preg_time = 2
+    mouse_preg_time = 3
     mouse_max_age = 0
 
     # owls
