@@ -1,10 +1,9 @@
 import animals
-from variables import Variables
-
+import copy
 from random import shuffle, randint
 from typing import Tuple
-import copy
 from termcolor import colored
+from variables import Variables
 
 
 def restart_cursor():

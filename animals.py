@@ -1,9 +1,8 @@
 import environment
-from variables import Variables
-
 from random import randint, shuffle
 from typing import Tuple
 from termcolor import colored
+from variables import Variables
 
 
 class Animal:
@@ -25,23 +24,19 @@ class Animal:
 
         # variables
         if parents and Variables.inherit_speed:
-            self.speed = self.inherit("speed")
+            self.speed = self.inherit_speed()
         else:
             self.speed = randint(1, 100)
 
     def __str__(self):
         if self.is_pregnant:
-            return colored(str(self.speed).zfill(environment.Environment.empty_field_spaces - 1), self.color, attrs=['underline'])+" "
+            return colored(str(self.speed).zfill(environment.Environment.empty_field_spaces - 1),
+                           self.color, attrs=['underline'])+" "
         else:
             return colored(str(self.speed).zfill(environment.Environment.empty_field_spaces - 1), self.color)+" "
 
-    def inherit(self, trait):
-        if trait == "speed":
-            mean_parent_trait = (self.parents[0].speed+self.parents[1].speed)/2
-
-        elif trait == "something else":
-            mean_parent_trait = (self.parents[0].something_else+self.parents[1].something_else)/2
-
+    def inherit_speed(self):
+        mean_parent_trait = (self.parents[0].speed+self.parents[1].speed)/2
         rand_variance_int = randint(-Variables.rand_variance_trait, Variables.rand_variance_trait)
         rand_trait_contribution = (mean_parent_trait/100)*rand_variance_int
 

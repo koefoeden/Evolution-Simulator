@@ -1,11 +1,9 @@
 import environment
-from variables import Variables
 import keyboard
 import time
 import cursor
-
-from os import system, name
-
+from os import system
+from variables import Variables
 
 
 if __name__ == '__main__':
@@ -17,7 +15,6 @@ if __name__ == '__main__':
         slow_mode = True
         cursor.hide()
         while True:
-            #try:
             if keyboard.is_pressed('space'):
                 object_environment.tick_and_print()
             elif keyboard.is_pressed('Left'):
