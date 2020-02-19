@@ -8,8 +8,8 @@ from os import system, name
 
 if __name__ == '__main__':
     system('color')
-    #object_environment = environment.Environment(n=20, m=250, o=35)
-    object_environment = environment.Environment(n=5, m=10, o=2)
+    object_environment = environment.Environment(n=20, m=250, o=35)
+    #object_environment = environment.Environment(n=5, m=10, o=2)
     object_environment.print_initial_tick()
 
     if Variables.keyboard_mode:
