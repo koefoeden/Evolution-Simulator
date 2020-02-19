@@ -41,18 +41,18 @@ class Tile:
 
 class Environment:
     empty_field_spaces = 4
-    empty_field = ' '*3 + " "
+    empty_field = ' '*empty_field_spaces
 
     def __init__(self):
         self.start_mice = cfg.mouse_number
         self.start_owls = cfg.owl_number
 
-        self.n = cfg.dimensions
+        self.dimensions = cfg.dimensions
         self.mice = []
         self.owls = []
         self.tick_no = 0
 
-        self.fields = [[Tile(x, y) for x in range(self.n)] for y in range(self.n)]
+        self.fields = [[Tile(x, y) for x in range(self.dimensions)] for y in range(self.dimensions)]
         self.mice_alive = 0
         self.owls_alive = 0
 
@@ -78,14 +78,14 @@ class Environment:
             self.owls_alive += 1
 
     def add_animals(self):
-        possibilities = [self.fields[y][x] for x in range(self.n) for y in range(self.n)]
-        shuffle(possibilities)
+        tile_list = [self.fields[y][x] for x in range(self.dimensions) for y in range(self.dimensions)]
+        shuffle(tile_list)
 
         for i in range(self.start_mice):
-            self.add_animal_at("mouse", possibilities[i])
+            self.add_animal_at("mouse", tile_list[i])
 
         for i2 in range(self.start_mice, self.start_mice + self.start_owls):
-            self.add_animal_at("owl", possibilities[i2])
+            self.add_animal_at("owl", tile_list[i2])
 
     def add_grass_and_rocks(self):
         for row in self.fields:
@@ -103,7 +103,7 @@ class Environment:
 
     def is_legal_field(self, x_y: Tuple[int, int]):
         x, y = x_y
-        return (x >= 0) and (y >= 0) and (x < self.n) and (y < self.n)
+        return (x >= 0) and (y >= 0) and (x < self.dimensions) and (y < self.dimensions)
 
     def animal_move_to(self, animal, tile):
         self.clear_field(animal)
@@ -196,7 +196,7 @@ class Environment:
 
     def print_board(self):
         print("    ", end='')
-        for i in range(self.n):
+        for i in range(self.dimensions):
             print("{:^4}".format(i), end='')
         print()
         for i, row in enumerate(self.fields):

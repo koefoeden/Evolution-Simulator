@@ -1,5 +1,5 @@
 # environment
-dimensions = 10
+dimensions = 20
 rock_chance = 0
 grass_grow_back = 5
 
@@ -11,15 +11,15 @@ rand_catch = True
 in_medias_res = True
 
 # mice
-mouse_number = 10
+mouse_number = 280
 mouse_die_of_hunger = 5
 mouse_preg_time = 3
 mouse_max_age = 0
 
 # owls
-owl_number = 0
-owl_die_of_hunger = 4
-owl_preg_time = 15
+owl_number = 10
+owl_die_of_hunger = 15
+owl_preg_time = 10
 owl_max_age = 0
 
 # inheritance

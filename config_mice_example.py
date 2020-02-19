@@ -18,8 +18,8 @@ mouse_max_age = 0
 
 # owls
 owl_number = 0
-owl_die_of_hunger = 15
-owl_preg_time = 4
+owl_die_of_hunger = 0
+owl_preg_time = 0
 owl_max_age = 0
 
 # inheritance
