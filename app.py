@@ -3,15 +3,14 @@ import keyboard
 import time
 import cursor
 from os import system
-from variables import Variables
-
+import config as cfg
 
 if __name__ == '__main__':
     system('color')
     object_environment = environment.Environment()
     object_environment.print_initial_tick()
 
-    if Variables.keyboard_mode:
+    if cfg.keyboard_mode:
         slow_mode = True
         cursor.hide()
         while True:
@@ -29,4 +28,4 @@ if __name__ == '__main__':
                 print("\r")
                 break
             if slow_mode:
-                time.sleep(Variables.slow_mode_sleep_time)
+                time.sleep(cfg.slow_mode_sleep_time)

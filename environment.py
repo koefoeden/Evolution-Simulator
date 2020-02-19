@@ -3,7 +3,7 @@ import copy
 from random import shuffle, randint
 from typing import Tuple
 from termcolor import colored
-from variables import Variables
+import config as cfg
 
 
 def restart_cursor():
@@ -21,8 +21,8 @@ class Tile:
         self.animal = None
         self.grass = False
 
-        if Variables.in_medias_res:
-            self.time_since_grass_eaten = randint(0, Variables.grass_grow_back)
+        if cfg.in_medias_res:
+            self.time_since_grass_eaten = randint(0, cfg.grass_grow_back)
         else:
             self.time_since_grass_eaten = 0
 
@@ -44,10 +44,10 @@ class Environment:
     empty_field = ' '*3 + " "
 
     def __init__(self):
-        self.start_mice = Variables.mouse_number
-        self.start_owls = Variables.owl_number
+        self.start_mice = cfg.mouse_number
+        self.start_owls = cfg.owl_number
 
-        self.n = Variables.dimensions
+        self.n = cfg.dimensions
         self.mice = []
         self.owls = []
         self.tick_no = 0
@@ -92,11 +92,11 @@ class Environment:
             for tile in row:
                 if not tile.animal:
                     rand_int = randint(1, 100)
-                    if rand_int <= Variables.rock_chance:
+                    if rand_int <= cfg.rock_chance:
                         tile.rock = True
                     else:
-                        if Variables.in_medias_res:
-                            if tile.time_since_grass_eaten == Variables.grass_grow_back:
+                        if cfg.in_medias_res:
+                            if tile.time_since_grass_eaten == cfg.grass_grow_back:
                                 tile.grass = True
                         else:
                             tile.grass = True
@@ -161,7 +161,7 @@ class Environment:
             for tile in row:
                 if not tile.rock:
                     tile.time_since_grass_eaten += 1
-                    if tile.time_since_grass_eaten == Variables.grass_grow_back:
+                    if tile.time_since_grass_eaten == cfg.grass_grow_back:
                         tile.grass = True
 
     def tick(self):

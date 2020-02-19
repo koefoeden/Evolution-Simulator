@@ -2,7 +2,7 @@ import environment
 from random import randint, shuffle
 from typing import Tuple
 from termcolor import colored
-from variables import Variables
+import config as cfg
 
 
 class Animal:
@@ -23,18 +23,18 @@ class Animal:
 
         # variables assigning
         if isinstance(self, Mouse):
-            self.die_of_hunger = Variables.mouse_die_of_hunger
-            self.preg_time = Variables.mouse_preg_time
-            self.max_age = Variables.mouse_max_age
+            self.die_of_hunger = cfg.mouse_die_of_hunger
+            self.preg_time = cfg.mouse_preg_time
+            self.max_age = cfg.mouse_max_age
         else:
-            self.die_of_hunger = Variables.owl_die_of_hunger
-            self.preg_time = Variables.owl_preg_time
-            self.max_age = Variables.owl_max_age
+            self.die_of_hunger = cfg.owl_die_of_hunger
+            self.preg_time = cfg.owl_preg_time
+            self.max_age = cfg.owl_max_age
 
         self.time_since_eaten = randint(0, self.die_of_hunger-2)
 
         # inheritance
-        if parents and Variables.inherit_speed:
+        if parents and cfg.inherit_speed:
             self.speed = self.inherit_speed()
         else:
             self.speed = randint(1, 100)
@@ -48,7 +48,7 @@ class Animal:
 
     def inherit_speed(self):
         mean_parent_trait = (self.parents[0].speed+self.parents[1].speed)/2
-        rand_variance_int = randint(-Variables.rand_variance_trait, Variables.rand_variance_trait)
+        rand_variance_int = randint(-cfg.rand_variance_trait, cfg.rand_variance_trait)
         rand_trait_contribution = (mean_parent_trait/100)*rand_variance_int
 
         return int(mean_parent_trait + rand_trait_contribution)
@@ -66,7 +66,7 @@ class Animal:
 
     def get_adj_legal_tiles(self):
         x_pos, y_pos = self.position
-        adj_coordinates = [(x_pos+x_move, y_pos+y_move) for x_move, y_move in Variables.dir_options]
+        adj_coordinates = [(x_pos+x_move, y_pos+y_move) for x_move, y_move in cfg.dir_options]
         adj_legal_coordinates = [field for field in adj_coordinates if self.env.is_legal_field(field)]
         adj_legal_tiles = [self.env.fields[y][x] for (x, y) in adj_legal_coordinates if not self.env.fields[y][x].rock]
         shuffle(adj_legal_tiles)
@@ -176,7 +176,7 @@ class Owl(Animal):
             mouse_near_position = mouse_near.position
 
             # random catch ON
-            if Variables.rand_catch:
+            if cfg.rand_catch:
                 owl_to_mouse_speed_percentage = round(100*(self.speed/mouse_near.speed))
                 rand_int = randint(1, 100)
                 if rand_int <= owl_to_mouse_speed_percentage:
@@ -195,7 +195,7 @@ class Owl(Animal):
                     return True
 
             # random catch OFF
-            elif not Variables.rand_catch:
+            elif not cfg.rand_catch:
                 if mouse_near.speed <= self.speed:
                     mouse_near.mark_as_dead()
                     self.time_since_eaten = 0
