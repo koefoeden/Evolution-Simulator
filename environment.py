@@ -28,20 +28,20 @@ class Tile:
 
     def __str__(self):
         if self.rock:
-            return colored("[-]", color='white')
+            return colored("[" + "-"*(Environment.field_size - 2) + "]", color='white')
         elif self.animal and self.grass:
             return self.animal.__str__()
         elif self.animal and not self.grass:
             return self.animal.__str__()
         elif not self.animal and self.grass:
-            return colored("M"*Environment.empty_field_spaces, color='green')
+            return colored("M" * Environment.field_size, color='green')
         else:
             return Environment.empty_field
 
 
 class Environment:
-    empty_field_spaces = 5
-    empty_field = ' '*empty_field_spaces
+    field_size = 3
+    empty_field = ' ' * field_size
 
     def __init__(self, config_parser):
         self.config_parser = config_parser
@@ -112,7 +112,7 @@ class Environment:
         return (x >= 0) and (y >= 0) and (x < self.dimensions) and (y < self.dimensions)
 
     def animal_move_to(self, animal, tile):
-        self.clear_field(animal)
+        self.clear_field_of_animal(animal)
         animal.position = tile.position
         tile.animal = animal
         if isinstance(animal, animals.Mouse):
@@ -121,7 +121,7 @@ class Environment:
                 tile.time_since_grass_eaten = 0
                 animal.time_since_eaten = 0
 
-    def clear_field(self, animal):
+    def clear_field_of_animal(self, animal):
         x, y = animal.position
         self.fields[y][x].animal = None
 
@@ -167,7 +167,7 @@ class Environment:
             for tile in row:
                 if not tile.rock:
                     tile.time_since_grass_eaten += 1
-                    if tile.time_since_grass_eaten == self.grass_grow_back:
+                    if tile.time_since_grass_eaten > self.grass_grow_back:
                         tile.grass = True
 
     def tick(self):
@@ -201,12 +201,12 @@ class Environment:
         return [avg_speed_mice, avg_speed_owls]
 
     def print_board(self):
-        print(" "*int((self.empty_field_spaces/2+0.5)), end='')
+        print(" "*3, end='')
         for i in range(self.dimensions):
-            print("{:^{}}".format(i, self.empty_field_spaces), end=' ')
+            print("{:^{}}".format(i+1, self.field_size), end=' ')
         print()
         for i, row in enumerate(self.fields):
-            print("{:>2}".format(i), end=' ')
+            print("{:>2}".format(i+1), end=' ')
             for item in row:
                 print(str(item), end=' ')
             print()

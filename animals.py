@@ -6,6 +6,7 @@ from termcolor import colored
 
 class Animal:
     sex_dict = {0: "male", 1: "female"}
+    dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]
 
     def __init__(self, x_y: Tuple[int, int], parents, env):
         self.position = x_y
@@ -26,7 +27,7 @@ class Animal:
             self.preg_time = int(self.env.config_parser['MICE']['preg_time'])
             self.max_age = int(self.env.config_parser['MICE']['max_age'])
         else:
-            self.die_of_hunger = int(self.env.config_parser['OWLS']['max_age'])
+            self.die_of_hunger = int(self.env.config_parser['OWLS']['die_of_hunger'])
             self.preg_time = int(self.env.config_parser['OWLS']['preg_time'])
             self.max_age = int(self.env.config_parser['OWLS']['max_age'])
 
@@ -39,10 +40,10 @@ class Animal:
             self.speed = randint(1, 100)
 
     def string_speed(self):
-        if len(str(self.speed)) > environment.Environment.empty_field_spaces:
+        if len(str(self.speed)) > environment.Environment.field_size:
             return '{:.0e}'.format(self.speed)
         else:
-            return str(self.speed).zfill(environment.Environment.empty_field_spaces)
+            return str(self.speed).zfill(environment.Environment.field_size)
 
     def __str__(self):
         if self.is_pregnant:
@@ -70,7 +71,7 @@ class Animal:
 
     def get_adj_legal_tiles(self):
         x_pos, y_pos = self.position
-        adj_coordinates = [(x_pos+x_move, y_pos+y_move) for x_move, y_move in [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]]
+        adj_coordinates = [(x_pos+x_move, y_pos+y_move) for x_move, y_move in Animal.dir_options]
         adj_legal_coordinates = [field for field in adj_coordinates if self.env.is_legal_field(field)]
         adj_legal_tiles = [self.env.fields[y][x] for (x, y) in adj_legal_coordinates if not self.env.fields[y][x].rock]
         shuffle(adj_legal_tiles)
@@ -111,7 +112,7 @@ class Mouse(Animal):
     def mark_as_dead(self):
         self.env.mice.remove(self)
         self.env.mice_alive -= 1
-        self.env.clear_field(self)
+        self.env.clear_field_of_animal(self)
 
     def action(self):
         if not self.has_moved:
@@ -162,7 +163,7 @@ class Owl(Animal):
     def mark_as_dead(self):
         self.env.owls.remove(self)
         self.env.owls_alive -= 1
-        self.env.clear_field(self)
+        self.env.clear_field_of_animal(self)
 
     def is_birth_time_action(self, tiles):
         if self.time_pregnant >= self.preg_time != 0 and tiles:
