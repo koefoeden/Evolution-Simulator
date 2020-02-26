@@ -2,7 +2,6 @@ import environment
 from random import randint, shuffle
 from typing import Tuple
 from termcolor import colored
-import config as cfg
 
 
 class Animal:
@@ -21,34 +20,39 @@ class Animal:
         self.has_moved = False
         self.adj_legal_tiles = self.get_adj_legal_tiles()
 
-        # variables assigning
+        # variables assigning - maybe redo?
         if isinstance(self, Mouse):
-            self.die_of_hunger = cfg.mouse_die_of_hunger
-            self.preg_time = cfg.mouse_preg_time
-            self.max_age = cfg.mouse_max_age
+            self.die_of_hunger = int(self.env.config_parser['MICE']['die_of_hunger'])
+            self.preg_time = int(self.env.config_parser['MICE']['preg_time'])
+            self.max_age = int(self.env.config_parser['MICE']['max_age'])
         else:
-            self.die_of_hunger = cfg.owl_die_of_hunger
-            self.preg_time = cfg.owl_preg_time
-            self.max_age = cfg.owl_max_age
+            self.die_of_hunger = int(self.env.config_parser['OWLS']['max_age'])
+            self.preg_time = int(self.env.config_parser['OWLS']['preg_time'])
+            self.max_age = int(self.env.config_parser['OWLS']['max_age'])
 
         self.time_since_eaten = randint(0, self.die_of_hunger-2)
 
         # inheritance
-        if parents and cfg.inherit_speed:
+        if parents and self.env.config_parser['INHERITANCE'].getboolean('speed'):
             self.speed = self.inherit_speed()
         else:
             self.speed = randint(1, 100)
 
+    def string_speed(self):
+        if len(str(self.speed)) > environment.Environment.empty_field_spaces:
+            return '{:.0e}'.format(self.speed)
+        else:
+            return str(self.speed).zfill(environment.Environment.empty_field_spaces)
+
     def __str__(self):
         if self.is_pregnant:
-            return colored(str(self.speed).zfill(environment.Environment.empty_field_spaces - 1),
-                           self.color, attrs=['underline'])+" "
+            return colored(self.string_speed(), self.color, attrs=['underline'])
         else:
-            return colored(str(self.speed).zfill(environment.Environment.empty_field_spaces - 1), self.color)+" "
+            return colored(self.string_speed(), self.color)
 
     def inherit_speed(self):
         mean_parent_trait = (self.parents[0].speed+self.parents[1].speed)/2
-        rand_variance_int = randint(-cfg.rand_variance_trait, cfg.rand_variance_trait)
+        rand_variance_int = randint(-self.env.rand_variance_trait, self.env.rand_variance_trait)
         rand_trait_contribution = (mean_parent_trait/100)*rand_variance_int
 
         return int(mean_parent_trait + rand_trait_contribution)
@@ -66,7 +70,7 @@ class Animal:
 
     def get_adj_legal_tiles(self):
         x_pos, y_pos = self.position
-        adj_coordinates = [(x_pos+x_move, y_pos+y_move) for x_move, y_move in cfg.dir_options]
+        adj_coordinates = [(x_pos+x_move, y_pos+y_move) for x_move, y_move in [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]]
         adj_legal_coordinates = [field for field in adj_coordinates if self.env.is_legal_field(field)]
         adj_legal_tiles = [self.env.fields[y][x] for (x, y) in adj_legal_coordinates if not self.env.fields[y][x].rock]
         shuffle(adj_legal_tiles)
@@ -176,7 +180,7 @@ class Owl(Animal):
             mouse_near_position = mouse_near.position
 
             # random catch ON
-            if cfg.rand_catch:
+            if self.env.rand_catch:
                 owl_to_mouse_speed_percentage = round(100*(self.speed/mouse_near.speed))
                 rand_int = randint(1, 100)
                 if rand_int <= owl_to_mouse_speed_percentage:
@@ -195,7 +199,7 @@ class Owl(Animal):
                     return True
 
             # random catch OFF
-            elif not cfg.rand_catch:
+            elif not self.env.rand_catch:
                 if mouse_near.speed <= self.speed:
                     mouse_near.mark_as_dead()
                     self.time_since_eaten = 0

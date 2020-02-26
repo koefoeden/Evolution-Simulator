@@ -3,7 +3,7 @@ import copy
 from random import shuffle, randint
 from typing import Tuple
 from termcolor import colored
-import config as cfg
+import configparser
 
 
 def restart_cursor():
@@ -15,44 +15,50 @@ def clear_screen():
 
 
 class Tile:
-    def __init__(self, x, y):
+    def __init__(self, x, y, env):
         self.position = (x, y)
         self.rock = False
         self.animal = None
         self.grass = False
 
-        if cfg.in_medias_res:
-            self.time_since_grass_eaten = randint(0, cfg.grass_grow_back)
+        if env.in_medias_res:
+            self.time_since_grass_eaten = randint(0, env.grass_grow_back)
         else:
             self.time_since_grass_eaten = 0
 
     def __str__(self):
         if self.rock:
-            return colored("[-]", color='white') + " "
+            return colored("[-]", color='white')
         elif self.animal and self.grass:
-            return colored(self.animal.__str__())
+            return self.animal.__str__()
         elif self.animal and not self.grass:
             return self.animal.__str__()
         elif not self.animal and self.grass:
-            return colored("MMM", color='green') + " "
+            return colored("M"*Environment.empty_field_spaces, color='green')
         else:
             return Environment.empty_field
 
 
 class Environment:
-    empty_field_spaces = 4
+    empty_field_spaces = 5
     empty_field = ' '*empty_field_spaces
 
-    def __init__(self):
-        self.start_mice = cfg.mouse_number
-        self.start_owls = cfg.owl_number
+    def __init__(self, config_parser):
+        self.config_parser = config_parser
+        self.start_mice = int(self.config_parser['MICE']['number'])
+        self.start_owls = int(self.config_parser['OWLS']['number'])
+        self.dimensions = int(self.config_parser['ENVIRONMENT']['dimensions'])
+        self.grass_grow_back = int(self.config_parser['ENVIRONMENT']['grass_grow_back'])
+        self.rock_chance = int(self.config_parser['ENVIRONMENT']['rock_chance'])
+        self.in_medias_res = self.config_parser['MECHANICS'].getboolean('in_medias_res')
+        self.rand_catch = self.config_parser['MECHANICS'].getboolean('rand_catch')
+        self.rand_variance_trait = int(self.config_parser['INHERITANCE']['rand_variance_trait'])
 
-        self.dimensions = cfg.dimensions
         self.mice = []
         self.owls = []
         self.tick_no = 0
 
-        self.fields = [[Tile(x, y) for x in range(self.dimensions)] for y in range(self.dimensions)]
+        self.fields = [[Tile(x, y, self) for x in range(self.dimensions)] for y in range(self.dimensions)]
         self.mice_alive = 0
         self.owls_alive = 0
 
@@ -92,11 +98,11 @@ class Environment:
             for tile in row:
                 if not tile.animal:
                     rand_int = randint(1, 100)
-                    if rand_int <= cfg.rock_chance:
+                    if rand_int <= self.rock_chance:
                         tile.rock = True
                     else:
-                        if cfg.in_medias_res:
-                            if tile.time_since_grass_eaten == cfg.grass_grow_back:
+                        if self.in_medias_res:
+                            if tile.time_since_grass_eaten == self.grass_grow_back:
                                 tile.grass = True
                         else:
                             tile.grass = True
@@ -161,7 +167,7 @@ class Environment:
             for tile in row:
                 if not tile.rock:
                     tile.time_since_grass_eaten += 1
-                    if tile.time_since_grass_eaten == cfg.grass_grow_back:
+                    if tile.time_since_grass_eaten == self.grass_grow_back:
                         tile.grass = True
 
     def tick(self):
@@ -195,14 +201,14 @@ class Environment:
         return [avg_speed_mice, avg_speed_owls]
 
     def print_board(self):
-        print("    ", end='')
+        print(" "*int((self.empty_field_spaces/2+0.5)), end='')
         for i in range(self.dimensions):
-            print("{:^4}".format(i), end='')
+            print("{:^{}}".format(i, self.empty_field_spaces), end=' ')
         print()
         for i, row in enumerate(self.fields):
-            print("{:^3}".format(i), end=' ')
+            print("{:>2}".format(i), end=' ')
             for item in row:
-                print(str(item), end='')
+                print(str(item), end=' ')
             print()
 
     def print_info_and_board(self):

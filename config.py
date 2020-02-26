@@ -31,6 +31,3 @@ inherit_speed = True
 
 # tick time:
 slow_mode_sleep_time = 0.1
-
-# keyboard mode
-keyboard_mode = True
