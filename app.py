@@ -6,8 +6,12 @@ from os import system
 import config as cfg
 import configparser
 
+
+########################
 # CONFIG FILE TO BE USED
-cfg_file = 'config_ini.ini'
+cfg_file = 'config.ini'
+########################
+
 
 if __name__ == '__main__':
     system('color')
@@ -26,9 +30,8 @@ if __name__ == '__main__':
         elif keyboard.is_pressed('Right'):
             slow_mode = False
         elif keyboard.is_pressed('q'):
-            system("cls")
-            print("\n")
-            print("\r")
+            environment.clear_screen()
+            environment.restart_cursor()
             break
         if slow_mode:
             time.sleep(cfg.slow_mode_sleep_time)
