@@ -31,7 +31,7 @@ class Animal:
             self.preg_time = int(self.env.config_parser['OWLS']['preg_time'])
             self.max_age = int(self.env.config_parser['OWLS']['max_age'])
 
-        self.time_since_eaten = randint(0, self.die_of_hunger-2)
+        self.time_since_eaten = randint(0, self.die_of_hunger-1)
 
         # inheritance
         if parents and self.env.config_parser['INHERITANCE'].getboolean('speed'):
