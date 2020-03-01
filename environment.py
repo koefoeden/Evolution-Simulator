@@ -1,7 +1,7 @@
 import animals
 import copy
 from random import shuffle, randint
-from typing import Tuple
+from typing import Tuple, List
 from termcolor import colored
 import configparser
 
@@ -15,7 +15,7 @@ def clear_screen():
 
 
 class Tile:
-    def __init__(self, x, y, env):
+    def __init__(self, x: int, y: int, env: object):
         self.position = (x, y)
         self.rock = False
         self.animal = None
@@ -66,12 +66,12 @@ class Environment:
         self.add_animals()
         self.add_grass_and_rocks()
 
-    def add_animal_at(self, animal: str, tile, parents=None):
+    def add_animal_at(self, animal: str, tile: object, parents: List[object] = None):
         if animal == "mouse":
             new_mouse = animals.Mouse(tile.position, parents, self)
             self.mice.append(new_mouse)
             tile.animal = new_mouse
-            tile.animal.grass = False
+            tile.animal.grass = False # TODO: hmm
             tile.animal.time_since_grass_eaten = 0
             self.mice_alive += 1
 
@@ -79,7 +79,7 @@ class Environment:
             new_owl = animals.Owl(tile.position, parents, self)
             self.owls.append(new_owl)
             tile.animal = new_owl
-            tile.animal.grass = False
+            tile.animal.grass = False  # TODO: Hmm
             tile.animal.time_since_grass_eaten = 0
             self.owls_alive += 1
 
@@ -111,7 +111,7 @@ class Environment:
         x, y = x_y
         return (x >= 0) and (y >= 0) and (x < self.dimensions) and (y < self.dimensions)
 
-    def animal_move_to(self, animal, tile):
+    def animal_move_to(self, animal: object, tile: object):
         self.clear_field_of_animal(animal)
         animal.position = tile.position
         tile.animal = animal
@@ -121,7 +121,7 @@ class Environment:
                 tile.time_since_grass_eaten = 0
                 animal.time_since_eaten = 0
 
-    def clear_field_of_animal(self, animal):
+    def clear_field_of_animal(self, animal: object):
         x, y = animal.position
         self.fields[y][x].animal = None
 
