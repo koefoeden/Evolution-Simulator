@@ -1,6 +1,6 @@
 import environment
 from random import randint, shuffle
-from typing import Tuple
+from typing import Tuple, List
 from termcolor import colored
 
 
@@ -8,7 +8,7 @@ class Animal:
     sex_dict = {0: "male", 1: "female"}
     dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]
 
-    def __init__(self, x_y: Tuple[int, int], parents, env):
+    def __init__(self, x_y: Tuple[int, int], parents: List[object], env: object):
         self.position = x_y
         self.is_pregnant = False
         self.is_pregnant_with = None
@@ -154,7 +154,7 @@ class Owl(Animal):
     ID = 0
     sex_color_dict = {'male': "red", 'female': 'yellow'}
 
-    def __init__(self, x_y: Tuple[int, int], parents, env=None):
+    def __init__(self, x_y: Tuple[int, int], parents: List[object], env: [object] = None):
         super().__init__(x_y, parents, env)
         self.ID = Owl.ID
         Owl.ID += 1
@@ -165,7 +165,7 @@ class Owl(Animal):
         self.env.owls_alive -= 1
         self.env.clear_field_of_animal(self)
 
-    def is_birth_time_action(self, tiles):
+    def is_birth_time_action(self, tiles: List[object]):
         if self.time_pregnant >= self.preg_time != 0 and tiles:
             self.env.add_animal_at("owl", tiles[0])
             self.time_pregnant = 0
