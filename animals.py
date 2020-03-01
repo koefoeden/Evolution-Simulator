@@ -8,7 +8,7 @@ class Animal:
     sex_dict = {0: "male", 1: "female"}
     dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]
 
-    def __init__(self, x_y: Tuple[int, int], parents: List[object], env: object):
+    def __init__(self, x_y: Tuple[int, int], parents: List, env):
         self.position = x_y
         self.is_pregnant = False
         self.is_pregnant_with = None
@@ -97,6 +97,9 @@ class Animal:
 
     def get_move_tiles(self):
         return [tile for tile in self.adj_legal_tiles if not tile.animal or tile.animal == self]
+
+    def mark_as_dead(self):
+        pass
 
 
 class Mouse(Animal):

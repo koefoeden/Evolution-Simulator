@@ -1,10 +1,10 @@
 import animals
 import copy
 from random import shuffle, randint
-from typing import Tuple, List
+from typing import Tuple, List, NewType
 from termcolor import colored
-import configparser
 
+TileType = NewType('')
 
 def restart_cursor():
     print("\x1b[1;1H")
@@ -15,7 +15,7 @@ def clear_screen():
 
 
 class Tile:
-    def __init__(self, x: int, y: int, env: object):
+    def __init__(self, x: int, y: int, env):
         self.position = (x, y)
         self.rock = False
         self.animal = None
@@ -66,12 +66,12 @@ class Environment:
         self.add_animals()
         self.add_grass_and_rocks()
 
-    def add_animal_at(self, animal: str, tile: object, parents: List[object] = None):
+    def add_animal_at(self, animal: str, tile, parents=None):
         if animal == "mouse":
             new_mouse = animals.Mouse(tile.position, parents, self)
             self.mice.append(new_mouse)
             tile.animal = new_mouse
-            tile.animal.grass = False # TODO: hmm
+            tile.animal.grass = False  # TODO: hmm
             tile.animal.time_since_grass_eaten = 0
             self.mice_alive += 1
 
@@ -111,7 +111,7 @@ class Environment:
         x, y = x_y
         return (x >= 0) and (y >= 0) and (x < self.dimensions) and (y < self.dimensions)
 
-    def animal_move_to(self, animal: object, tile: object):
+    def animal_move_to(self, animal, tile):
         self.clear_field_of_animal(animal)
         animal.position = tile.position
         tile.animal = animal
@@ -121,7 +121,7 @@ class Environment:
                 tile.time_since_grass_eaten = 0
                 animal.time_since_eaten = 0
 
-    def clear_field_of_animal(self, animal: object):
+    def clear_field_of_animal(self, animal):
         x, y = animal.position
         self.fields[y][x].animal = None
 
@@ -229,5 +229,3 @@ class Environment:
         self.tick()
         print(colored("Tick: {}         ".format(self.tick_no), attrs=['bold']))
         self.print_info_and_board()
-
-
