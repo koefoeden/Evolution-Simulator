@@ -1,22 +1,24 @@
 import tkinter as tk
 import environment
 import animals
-from PIL import Image
+#from PIL import Image
 
 
 
 class View:
     def __init__(self, env):
-        root = tk.Tk()
-        owl_image = tk.PhotoImage(file="Images/owl_image_50.GIF")
-        mouse_image = tk.PhotoImage(file="Images/mouse_resized.pgm")
-        root.geometry("1280x720")
-        root["bg"] = "black"
+        self.env = env
+        self.root = tk.Tk()
+        self.owl_image = tk.PhotoImage(file="Images/owl_image_50.GIF")
+        self.mouse_image = tk.PhotoImage(file="Images/mouse_resized.pgm")
+        self.root.geometry("1280x720")
+        self.root["bg"] = "black"
 
-        for r in range(env.dimensions):
-            for c in range(env.dimensions):
-                if isinstance(env.fields[r][c].animal, animals.Owl):
-                    tk.Label(root, text="This is a label", image=owl_image).grid(row=r, column=c)
+    def update_view(self):
+        for r in range(self.env.dimensions):
+            for c in range(self.env.dimensions):
+                if isinstance(self.env.fields[r][c].animal, animals.Owl):
+                    tk.Label(self.root, text="This is a label", image=self.owl_image).grid(row=r, column=c)
                 else:
-                    tk.Label(root, text="mouse here", image=mouse_image).grid(row=r, column=c)
-        root.mainloop()
+                    tk.Label(self.root, text="mouse here", image=self.mouse_image).grid(row=r, column=c)
+        #self.root.mainloop()

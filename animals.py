@@ -40,10 +40,12 @@ class Animal:
             self.speed = randint(1, 100)
 
     def string_speed(self):
-        if len(str(self.speed)) > environment.Environment.field_size:
-            return '{:.0e}'.format(self.speed)
-        else:
+        if environment.Environment.field_size < 5:
+            if len(str(self.speed)) > environment.Environment.field_size:
+                environment.Environment.field_size += 1
             return str(self.speed).zfill(environment.Environment.field_size)
+        else:
+            return '{:.0e}'.format(self.speed)
 
     def __str__(self):
         if self.is_pregnant:

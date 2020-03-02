@@ -35,12 +35,11 @@ class Tile:
         elif not self.animal and self.grass:
             return colored("M" * Environment.field_size, color='green')
         else:
-            return Environment.empty_field
+            return ' ' * Environment.field_size
 
 
 class Environment:
-    field_size = 5
-    empty_field = ' ' * field_size
+    field_size = 3
 
     def __init__(self, config_parser):
         self.config_parser = config_parser
@@ -200,12 +199,12 @@ class Environment:
         return [avg_speed_mice, avg_speed_owls]
 
     def print_board(self):
-        print(" "*3, end='')
+        print(" "*4, end='')
         for i in range(self.dimensions):
             print("{:^{}}".format(i+1, self.field_size), end=' ')
         print()
         for i, row in enumerate(self.fields):
-            print("{:>2}".format(i+1), end=' ')
+            print(" {:>2}".format(i+1), end=' ')
             for item in row:
                 print(str(item), end=' ')
             print()
@@ -214,17 +213,17 @@ class Environment:
         print()
         self.print_board()
         print()
-        print("Mice: {:<5}  Avg. speed: {}".format(self.mice_alive, self.average_speed()[0]))
-        print("Owls: {:<5}  Avg. speed: {}".format(self.owls_alive, self.average_speed()[1]))
+        print(" Mice: {:<5}  Avg. speed: {}".format(self.mice_alive, self.average_speed()[0]))
+        print(" Owls: {:<5}  Avg. speed: {}".format(self.owls_alive, self.average_speed()[1]))
 
     def print_initial_tick(self):
         clear_screen()
         restart_cursor()
-        print(colored("Initial board", attrs=['bold']))
+        print(colored(" Initial board", attrs=['bold']))
         self.print_info_and_board()
 
     def tick_and_print(self):
         restart_cursor()
         self.tick()
-        print(colored("Tick: {}         ".format(self.tick_no), attrs=['bold']))
+        print(colored(" Tick: {}         ".format(self.tick_no), attrs=['bold']))
         self.print_info_and_board()
