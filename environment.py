@@ -4,8 +4,6 @@ from random import shuffle, randint
 from typing import Tuple, List, NewType
 from termcolor import colored
 
-TileType = NewType('')
-
 def restart_cursor():
     print("\x1b[1;1H")
 
