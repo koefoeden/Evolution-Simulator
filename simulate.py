@@ -4,13 +4,14 @@ import time
 import cursor
 from os import system
 import configparser
+import graphics
 
 
 ########################
 # CHOOSE A CONFIG FILE TO BE USED - OR MAKE YOUR OWN:
 
-cfg_file = 'config.ini'
-# cfg_file = 'config_owls_and_mice_example.ini'
+#cfg_file = 'config.ini'
+cfg_file = 'config_owls_and_mice_example.ini'
 # cfg_le = 'config_mice_example.ini'
 ########################
 
@@ -22,6 +23,7 @@ if __name__ == '__main__':
 
     object_environment = environment.Environment(config_parser)
     object_environment.print_initial_tick()
+    graphics.View(object_environment)
     slow_mode = True
     cursor.hide()
 

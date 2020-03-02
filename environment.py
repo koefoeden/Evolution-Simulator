@@ -1,8 +1,9 @@
 import animals
 import copy
 from random import shuffle, randint
-from typing import Tuple, List, NewType
+from typing import Tuple
 from termcolor import colored
+
 
 def restart_cursor():
     print("\x1b[1;1H")
@@ -38,7 +39,7 @@ class Tile:
 
 
 class Environment:
-    field_size = 3
+    field_size = 5
     empty_field = ' ' * field_size
 
     def __init__(self, config_parser):
