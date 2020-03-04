@@ -17,4 +17,4 @@ def collapse_data(filename):
         print(new_df)
         i+=1
 """
-collapse_data("C:/Users/Thomas/PycharmProjects/Simulation/results.csv")
+collapse_data("/results_2.csv")
