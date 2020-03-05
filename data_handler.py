@@ -36,19 +36,5 @@ class Analyzer:
         df_group = self.df.groupby(group_by_list)['avg_speed_mouse'].count()
         df_group.to_csv("non_NA_count.csv")
 
-
-"""
-    new_df = pd.DataFrame(columns=['avg_speed_mouse', 'number_of_reps'])
-    for name, group in df_group:
-        group_average_speed = group['avg_speed_mouse'].mean()
-        
-        repetitions = group['number_of_reps'].sum()
-        print(new_df)
-        i+=1
-"""
-
 if __name__ == "__main__":
     analyzer = Analyzer("results_data_analysis.csv")
-    analyzer.get_na_count("results_data_analysis.csv")
-    analyzer.get_non_na_count("results_data_analysis.csv")
-    analyzer.average_data("results_data_analysis.csv")

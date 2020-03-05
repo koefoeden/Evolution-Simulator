@@ -23,13 +23,13 @@ class Animal:
 
         # variables assigning - maybe redo?
         if isinstance(self, Mouse):
-            self.die_of_hunger = int(self.env.config_parser['MICE']['die_of_hunger'])
-            self.preg_time = int(self.env.config_parser['MICE']['preg_time'])
-            self.max_age = int(self.env.config_parser['MICE']['max_age'])
+            self.die_of_hunger = int(self.env.config_parser['MICE']['m_die_of_hunger'])
+            self.preg_time = int(self.env.config_parser['MICE']['m_preg_time'])
+            self.max_age = int(self.env.config_parser['MICE']['m_max_age'])
         else:
-            self.die_of_hunger = int(self.env.config_parser['OWLS']['die_of_hunger'])
-            self.preg_time = int(self.env.config_parser['OWLS']['preg_time'])
-            self.max_age = int(self.env.config_parser['OWLS']['max_age'])
+            self.die_of_hunger = int(self.env.config_parser['OWLS']['o_die_of_hunger'])
+            self.preg_time = int(self.env.config_parser['OWLS']['o_preg_time'])
+            self.max_age = int(self.env.config_parser['OWLS']['o_max_age'])
 
         self.time_since_eaten = randint(0, self.die_of_hunger-1)
 

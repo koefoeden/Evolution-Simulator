@@ -43,8 +43,8 @@ class Environment:
 
     def __init__(self, config_parser):
         self.config_parser = config_parser
-        self.start_mice = int(self.config_parser['MICE']['number'])
-        self.start_owls = int(self.config_parser['OWLS']['number'])
+        self.start_mice = int(self.config_parser['MICE']['m_number'])
+        self.start_owls = int(self.config_parser['OWLS']['o_number'])
         self.dimensions = int(self.config_parser['ENVIRONMENT']['dimensions'])
         self.grass_grow_back = int(self.config_parser['ENVIRONMENT']['grass_grow_back'])
         self.rock_chance = int(self.config_parser['ENVIRONMENT']['rock_chance'])
@@ -175,6 +175,10 @@ class Environment:
         self.reset_moves()
         self.grow_grass()
         self.tick_no += 1
+
+    def multiple_ticks(self, n):
+        for i in range(n):
+            self.tick()
 
     def average_speed(self):
         total_speed_mice = 0
