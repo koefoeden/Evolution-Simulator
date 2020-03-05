@@ -5,15 +5,15 @@ import csv
 import time
 
 # mice configs
-mouse_die_of_hunger_configs = [x for x in range(2, 11)]
-mouse_preg_time_configs = [x for x in range(1,11)]
+mouse_die_of_hunger_configs = [x for x in range(1, 4)]
+mouse_preg_time_configs = [x for x in range(1,4)]
 
 # owl configs
 owl_die_of_hunger_configs = [x for x in range(10)]
 owl_preg_time_configs = [x for x in range(10)]
 
 ticks = 100
-repetitions = 1
+repetitions = 5
 
 ########################
 # CONFIG FILE TO BE USED AS TEMPLATE
@@ -21,7 +21,7 @@ repetitions = 1
 cfg_file = 'config_automatic_testing.ini'
 ########################
 # OUTPUT FILE
-results_file = 'results.csv'
+results_file = 'results_data_analysis.csv'
 ########################
 if __name__ == '__main__':
     system('color')
