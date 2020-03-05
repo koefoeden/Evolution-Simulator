@@ -23,7 +23,6 @@ if __name__ == '__main__':
 
     object_environment = environment.Environment(config_parser)
     object_environment.print_initial_tick()
-    #view = graphics.View(object_environment)
     slow_mode = True
     cursor.hide()
 
@@ -40,6 +39,3 @@ if __name__ == '__main__':
             break
         if slow_mode:
             time.sleep(slow_mode_sleep_time)
-        #view.root.update_idletasks()
-        #view.root.update()
-        #view.update_view()
