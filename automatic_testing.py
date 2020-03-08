@@ -2,13 +2,14 @@ import environment
 import configparser
 import csv
 import re
+import os
 
 ########################
 # CONFIG FILE TO BE USED FOR SIMULATION
 cfg_file = 'config_automatic_testing.ini'
 ########################
-# OUTPUT FILE FOR RESULTS
-results_file = 'data8.csv'
+# NAME OF OUTPUT FILE
+results_file = 'results/data_new_analysis.csv'
 ########################
 
 class Tester:
@@ -49,7 +50,7 @@ class Tester:
                 for section in self.config_parser.sections():
                     for (key, val) in self.config_parser.items(section):
                         header.append(key)
-                header.extend(['avg_speed_mouse'])
+                header.extend(['avg_speed_mouse', 'ticks'])
 
                 writer = csv.writer(csv_file, delimiter=',')
                 writer.writerow(header)
@@ -81,7 +82,7 @@ class Tester:
                             object_environment.multiple_ticks(self.ticks)
 
                             # add average speed to row data
-                            row_data.append(object_environment.average_speed()[0])
+                            row_data.extend([object_environment.average_speed()[0], self.ticks])
 
                             # write full row data into file
                             with open(results_file, 'a+', newline='') as csv_file:
