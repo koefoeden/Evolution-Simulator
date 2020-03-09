@@ -7,3 +7,5 @@ Simulates evolution based on a simple environment of mice eating grass, while be
 2. Open an activated cmd-window and run either automatic_testing.py or simulate.py
 3. Enjoy!
 
+More info to come.
+
