@@ -8,9 +8,9 @@ import configparser
 
 ########################
 # CHOOSE A CONFIG FILE TO BE USED - OR MAKE YOUR OWN:
-# cfg_file = '../config.ini'
+cfg_file = '../config.ini'
 # cfg_file = '../example_configs/mice_and_owls.ini'
-# cfg_le = '../example_configs/only_mice.ini'
+# cfg_file = '../example_configs/only_mice.ini'
 ########################
 
 
@@ -40,3 +40,7 @@ class Simulate:
                 break
             if slow_mode:
                 time.sleep(slow_mode_sleep_time)
+
+
+if __name__ == '__main__':
+    Simulate(cfg_file)

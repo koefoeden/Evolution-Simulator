@@ -15,9 +15,9 @@ results_file = '../results/automatic_testing.csv'
 
 class Tester:
     def __init__(self, cfg_file_param):
-        self.cfg_file = cfg_file_param
+        self.cfg_file_name = cfg_file_param
         self.config_parser = configparser.ConfigParser()
-        self.config_parser.read(self.cfg_file)
+        self.config_parser.read(self.cfg_file_name)
         self.regex_range = r"([0-9]+)[^0-9]*([0-9]*)[^0-9]*([0-9]*)"
 
         # set config values
@@ -142,3 +142,6 @@ class Tester:
         with open(results_file, 'a+', newline='') as csv_file:
             writer = csv.writer(csv_file, delimiter=',')
             writer.writerow(row_data)
+
+if __name__=='__main__':
+    Tester(cfg_file)
