@@ -1,1 +1,0 @@
-cmd.exe /K "cd venv\Scripts && activate && cd ..\.."

@@ -37,4 +37,4 @@ class Analyzer:
 
 
 if __name__ == "__main__":
-    analyzer = Analyzer("results/automatic_testing.csv")
+    analyzer = Analyzer("../results/automatic_testing.csv")

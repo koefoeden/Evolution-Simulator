@@ -1,17 +1,16 @@
-import environment
+from src import environment
 import configparser
 import csv
 import re
-import os
 import time
 
 ########################
 # CONFIG FILE TO BE USED FOR SIMULATION
-cfg_file = 'auto_testing_config.ini'
+cfg_file = './auto_testing_config.ini'
 ########################
 # OUTPUT FILE FOR SIMULATION RESULTS
 # IF IT DOESN'T EXIST, A NEW ONE WILL BE CREATED. OTHERWISE DATA WILL BE APPENDED TO.
-results_file = 'results/automatic_testing.csv'
+results_file = './results/automatic_testing.csv'
 ########################
 
 class Tester:
@@ -39,7 +38,7 @@ class Tester:
         if self.confirm_test_prompt():
             self.run_simulations()
         else:
-            print('Aborting simulation.')
+            print('Simulation aborted.')
 
     def get_config_values(self, config_parser_string):
         match_instance = re.match(self.regex_range, config_parser_string)
@@ -143,7 +142,3 @@ class Tester:
         with open(results_file, 'a+', newline='') as csv_file:
             writer = csv.writer(csv_file, delimiter=',')
             writer.writerow(row_data)
-
-
-if __name__ == '__main__':
-    tester = Tester(cfg_file)

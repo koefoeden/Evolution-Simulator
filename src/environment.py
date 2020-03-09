@@ -1,4 +1,4 @@
-import animals
+from src import animals
 import copy
 from random import shuffle, randint
 from typing import Tuple

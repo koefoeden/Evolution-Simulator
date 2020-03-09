@@ -1,0 +1,1 @@
+cmd.exe /K "cd venv\Scripts && activate && cd ..\.. && python app.py"
