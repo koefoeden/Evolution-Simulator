@@ -58,7 +58,7 @@ class Animal:
         rand_variance_int = randint(-self.env.rand_variance_trait, self.env.rand_variance_trait)
         rand_trait_contribution = (mean_parent_trait/100)*rand_variance_int
 
-        return int(mean_parent_trait + rand_trait_contribution)
+        return max(int(mean_parent_trait + rand_trait_contribution), 1)
 
     def is_dead_action(self):
         if (self.time_since_eaten == self.die_of_hunger and self.die_of_hunger != 0) or \
