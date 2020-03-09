@@ -33,8 +33,8 @@ class Analyzer:
         self.df_final_rounded = self.df_final.round(2)
 
         # print to csv
-        self.df_final_rounded.to_csv('results/final.csv', index=False)
+        self.df_final_rounded.to_csv('results/grouped_results.csv', index=False)
 
 
 if __name__ == "__main__":
-    analyzer = Analyzer("results/data_new_analysis.csv")
+    analyzer = Analyzer("results/automatic_testing.csv")

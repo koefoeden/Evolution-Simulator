@@ -9,10 +9,9 @@ import graphics
 
 ########################
 # CHOOSE A CONFIG FILE TO BE USED - OR MAKE YOUR OWN:
-
 #cfg_file = 'config.ini'
-cfg_file = 'config_owls_and_mice_example.ini'
-# cfg_le = 'config_mice_example.ini'
+cfg_file = 'example_configs/mice_and_owls.ini'
+# cfg_le = 'example_configs/only_mice.ini'
 ########################
 
 if __name__ == '__main__':
