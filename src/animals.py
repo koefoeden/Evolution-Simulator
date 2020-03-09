@@ -1,4 +1,4 @@
-from src import environment
+import environment
 from random import randint, shuffle
 from typing import Tuple, List
 from termcolor import colored

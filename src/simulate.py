@@ -1,4 +1,4 @@
-from src import environment
+import environment
 import keyboard
 import time
 import cursor
@@ -8,9 +8,9 @@ import configparser
 
 ########################
 # CHOOSE A CONFIG FILE TO BE USED - OR MAKE YOUR OWN:
-# cfg_file = 'config.ini'
-# cfg_file = 'example_configs/mice_and_owls.ini'
-# cfg_le = 'example_configs/only_mice.ini'
+# cfg_file = '../config.ini'
+# cfg_file = '../example_configs/mice_and_owls.ini'
+# cfg_le = '../example_configs/only_mice.ini'
 ########################
 
 

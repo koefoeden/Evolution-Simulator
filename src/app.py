@@ -1,5 +1,5 @@
 from tkinter import *
-from src import automatic_testing, simulate
+import automatic_testing, simulate
 from tkinterhtml import HtmlFrame
 
 
@@ -14,7 +14,7 @@ class MainWindow(Frame):
         window.title('Choose a configuration')
 
     def get_welcome_text(self):
-        reader = open("./resources/welcome_text.html", 'r')
+        reader = open("../resources/welcome_text.html", 'r')
         return reader.read()
 
     def interactive_button_action(self):
@@ -51,7 +51,7 @@ class InteractivePopup(Toplevel):
         self.grab_set()  # hijack all commands from the master (clicks on the main window are ignored)
         master.wait_window(self)  # pause anything on the main window until this one closes (optional)
 
-        simulate.Simulate('./config.ini')
+        simulate.Simulate('../config.ini')
 
 
 class AutomaticPopup(Toplevel):
@@ -61,7 +61,7 @@ class AutomaticPopup(Toplevel):
         self.grab_set()  # hijack all commands from the master (clicks on the main window are ignored)
         master.wait_window(self)  # pause anything on the main window until this one closes (optional)
 
-        automatic_testing.Tester('./auto_testing_config.ini')
+        automatic_testing.Tester('../auto_testing_config.ini')
 
 
 def main():

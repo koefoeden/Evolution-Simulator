@@ -1,5 +1,5 @@
 import tkinter as tk
-from src import animals
+import animals
 
 
 #from PIL import Image

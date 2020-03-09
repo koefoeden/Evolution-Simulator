@@ -5002,3 +5002,4 @@ dimensions,rock_chance,grass_grow_back,rand_catch,in_medias_res,m_number,m_die_o
 20,0,5,True,True,280,4,4,0,10,5,3,0,20,True,500,164,N/A
 20,0,5,True,True,280,4,4,0,10,5,4,0,20,True,500,173,N/A
 20,0,5,True,True,280,4,4,0,10,5,5,0,20,True,500,184,N/A
+20,0,5,True,True,280,3,2,0,10,5,3,0,20,True,500,103,N/A
