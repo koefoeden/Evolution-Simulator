@@ -8,9 +8,9 @@ import configparser
 
 ########################
 # CHOOSE A CONFIG FILE TO BE USED - OR MAKE YOUR OWN:
-cfg_file = '../config.ini'
-# cfg_file = '../example_configs/mice_and_owls.ini'
-# cfg_file = '../example_configs/only_mice.ini'
+cfg_file = '../configs/my_config.ini'
+# cfg_file = '../configs/mice_and_owls.ini'
+# cfg_file = '../configs/only_mice.ini'
 ########################
 
 
