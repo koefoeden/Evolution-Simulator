@@ -6,7 +6,7 @@ import time
 
 ########################
 # CONFIG FILE TO BE USED FOR SIMULATION
-cfg_file = '../auto_testing_config.ini'
+cfg_file = '../my_config.ini'
 ########################
 # OUTPUT FILE FOR SIMULATION RESULTS
 # IF IT DOESN'T EXIST, A NEW ONE WILL BE CREATED. OTHERWISE DATA WILL BE APPENDED TO.
