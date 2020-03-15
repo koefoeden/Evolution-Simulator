@@ -213,21 +213,34 @@ class Environment:
                 print(str(item), end=' ')
             print()
 
-    def print_info_and_board(self):
+    def print_info(self):
+        print(" Mice: {:<5}  Avg. speed: {}".format(self.mice_alive, self.average_speed()[0]))
+        print(" Owls: {:<5}  Avg. speed: {}".format(self.owls_alive, self.average_speed()[1]))
+
+    def print_controls(self):
+        print(' Controls:')
+        print(" Space       -> Advance the simulation.")
+        print(" Right arrow -> Increase simulation speed.")
+        print(" Left arrow  -> Decrease simulation speed.")
+        print(" q           -> Quit simulation")
+
+    def print_all(self):
         print()
         self.print_board()
         print()
-        print(" Mice: {:<5}  Avg. speed: {}".format(self.mice_alive, self.average_speed()[0]))
-        print(" Owls: {:<5}  Avg. speed: {}".format(self.owls_alive, self.average_speed()[1]))
+        self.print_info()
+        print()
+        self.print_controls()
+
 
     def print_initial_tick(self):
         clear_screen()
         restart_cursor()
         print(colored(" Initial board", attrs=['bold']))
-        self.print_info_and_board()
+        self.print_all()
 
     def tick_and_print(self):
         restart_cursor()
         self.tick()
         print(colored(" Tick: {}         ".format(self.tick_no), attrs=['bold']))
-        self.print_info_and_board()
+        self.print_all()

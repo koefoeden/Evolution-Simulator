@@ -31,11 +31,13 @@ class MainWindow(Frame):
 
         # Mode buttons
         button_interactive = Button(frame_bottom, text="Interactive simulation",
-                                    command=self.interactive_button_action)
+                                    command=self.interactive_button_action,
+                                    font=10)
         button_interactive.pack(side=LEFT, padx=100, pady=10)
 
         button_automatic_testing = Button(frame_bottom, text="Automatic config testing",
-                                          command=self.automatic_testing_button_action)
+                                          command=self.automatic_testing_button_action,
+                                          font=10)
         button_automatic_testing.pack(side=RIGHT, padx=100, pady=10)
 
     def interactive_button_action(self):
@@ -50,7 +52,8 @@ class InteractivePopup(Toplevel):
         Toplevel.__init__(self, master)
         self.interactive_mode = interactive_mode
         self.title('Choose a configuration')
-        self.geometry(get_geometry(700, 200))
+        self.width = 500
+        self.geometry(get_geometry(self.width, 180))
 
         # Example configs
         if self.interactive_mode:
@@ -62,7 +65,7 @@ class InteractivePopup(Toplevel):
 
         # menu-selected
         self.tk_var = StringVar(self)
-        self.tk_var.set('my_config.ini')
+        self.tk_var.set('Select a config...')
 
         self.drop_down_menu = None
         self.edit_button = None
@@ -74,16 +77,18 @@ class InteractivePopup(Toplevel):
 
     def make_widgets(self):
         # frames
-        self.top_frame = Frame(self, highlightbackground='red', highlightthickness=5)
+        self.top_frame = Frame(self)
+        self.top_frame.configure(highlightbackground='red', highlightthickness=5)
         self.top_frame.pack(side=TOP, fill=BOTH, expand=TRUE)
-        self.mid_frame = Frame(self, highlightbackground='yellow', highlightthickness=5)
+        self.mid_frame = Frame(self)
+        self.mid_frame.configure(highlightbackground='yellow', highlightthickness=5)
         self.mid_frame.pack(side=TOP, pady=0, fill=BOTH)
         self.bottom_frame = Frame(self)
         self.bottom_frame.pack()
 
         # label
-        label = Label(self.top_frame, text='Choose one of the pre-defined configuration for the simulation via the '
-                                           'drop-down menu below, or add a new one.', pady=10, padx=10)
+        label = Message(self.top_frame, text='Choose one of the pre-defined configuration for the simulation via the '
+                                           'drop-down menu below, or add a new one.', pady=5, padx=10, width=self.width)
         label.pack()
 
         label_menu = Label(self.top_frame, text="Configurations")
@@ -91,11 +96,11 @@ class InteractivePopup(Toplevel):
 
         # Drop-down menu
         self.drop_down_menu = OptionMenu(self.mid_frame, self.tk_var, *self.list_of_configs, command=self.dropdown_changed)
-        self.drop_down_menu.pack(side=LEFT, padx=30)
+        self.drop_down_menu.pack(side=LEFT, padx=20)
 
         # Buttons
         add_button = Button(self.mid_frame, text='Add new', command=self.add_button_pressed)
-        add_button.pack(side=RIGHT, padx=40)
+        add_button.pack(side=RIGHT, padx=(40,15))
 
         if self.interactive_mode:
             ok_button = Button(self, text="Start simulation", command=self.ok_button_pressed)
@@ -104,8 +109,20 @@ class InteractivePopup(Toplevel):
 
         ok_button.pack(side=BOTTOM, pady=20)
 
+        self.delete_button = Button(self.mid_frame, text='Delete', command=self.delete_button_pressed)
+        self.delete_button.pack(side=RIGHT, padx=0)
+
         self.edit_button = Button(self.mid_frame, text='Edit', command=self.edit_button_pressed)
-        self.edit_button.pack(side=LEFT, padx=0)
+        self.edit_button.pack(side=RIGHT, padx=10, anchor=CENTER)
+
+    def delete_button_pressed(self):
+        if self.interactive_mode:
+            os.remove("..\\configs\\interactive\\"+self.tk_var.get())
+        else:
+            os.remove("..\\configs\\automatic_testing\\"+self.tk_var.get())
+
+        self.update_dropdown_list()
+        self.tk_var.set('Select a config...')
 
     def dropdown_changed(self, selected=None):
         if self.tk_var.get() in self.example_configs:
@@ -115,22 +132,29 @@ class InteractivePopup(Toplevel):
 
     def add_button_pressed(self):
         NameInputBox(self)
+        self.update_dropdown_list()
 
+    def update_dropdown_list(self):
         menu = self.drop_down_menu["menu"]
         menu.delete(0, "end")
         if self.interactive_mode:
             for name in os.listdir("..\\configs\\interactive"):
                 menu.add_command(label=name, command=lambda value=name: self.tk_var.set(value))
+                #self.drop_down_menu.configure(command=self.dropdown_changed)
         else:
             for name in os.listdir("..\\configs\\automatic_testing"):
                 menu.add_command(label=name, command=lambda value=name: self.tk_var.set(value))
 
     def ok_button_pressed(self):
-        self.destroy()
-        if self.interactive_mode:
-            simulate.Simulate('..\\configs\\interactive\\'+str(self.tk_var.get()))
-        else:
-            automatic_testing.Tester('..\\configs\\automatic_testing\\'+str(self.tk_var.get()))
+        if self.tk_var.get() in os.listdir("../configs/automatic_testing") or \
+                self.tk_var.get() in os.listdir("../configs/interactive"):
+            self.master.master.wm_state('iconic')
+            self.destroy()
+            if self.interactive_mode:
+                simulate.Simulate('..\\configs\\interactive\\'+str(self.tk_var.get()))
+            else:
+                automatic_testing.Tester('..\\configs\\automatic_testing\\'+str(self.tk_var.get()))
+            self.master.master.deiconify()
 
     def edit_button_pressed(self):
         if self.tk_var.get() in self.example_configs:
@@ -149,17 +173,18 @@ class NameInputBox(Toplevel):
 
         #Entry widget
         self.entry_widget = Entry(self)
-        self.entry_widget.pack()
+        self.entry_widget.pack(side=LEFT, padx=10)
+        self.entry_widget.bind('<Return>', self.ok_button_pressed)
 
         # OK Button
-        ok_button = Button(self, text="OK", command=self.ok_button_pressed)
-        ok_button.pack()
+        ok_button = Button(self, text="Add", command=self.ok_button_pressed)
+        ok_button.pack(side=LEFT)
 
         self.transient(master)  # set to be on top of the main window
         self.grab_set()  # hijack all commands from the master (clicks on the main window are ignored)
         master.wait_window(self)  # pause anything on the main window until this one closes (optional)
 
-    def ok_button_pressed(self):
+    def ok_button_pressed(self, event=None):
         if self.master.interactive_mode:
             copyfile("..\\configs\\interactive\\mice_and_owls.ini",
                      "..\\configs\\interactive\\"+self.entry_widget.get()+".ini")
@@ -183,6 +208,7 @@ if __name__=='__main__':
 
     root.tk_setPalette(background='white', foreground='black',
                        activeBackground='gray', activeForeground='black')
+
     window = MainWindow(root)
 
     root.mainloop()
