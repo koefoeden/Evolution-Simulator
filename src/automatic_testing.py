@@ -3,15 +3,17 @@ import configparser
 import csv
 import re
 import time
+import sys
 
 ########################
 # CONFIG FILE TO BE USED FOR SIMULATION
-cfg_file = '../my_config.ini'
+cfg_file = '../configs/automatic_testing/my_config.ini'
 ########################
 # OUTPUT FILE FOR SIMULATION RESULTS
 # IF IT DOESN'T EXIST, A NEW ONE WILL BE CREATED. OTHERWISE DATA WILL BE APPENDED TO.
 results_file = '../results/automatic_testing.csv'
 ########################
+
 
 class Tester:
     def __init__(self, cfg_file_param):
@@ -144,4 +146,7 @@ class Tester:
             writer.writerow(row_data)
 
 if __name__=='__main__':
-    Tester(cfg_file)
+    try :
+        Tester(sys.argv[1])
+    except IndexError:
+        Tester(cfg_file)

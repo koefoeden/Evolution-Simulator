@@ -6,6 +6,7 @@ from tkinterhtml import HtmlFrame
 import os
 import configparser
 from shutil import copyfile
+import subprocess
 
 
 class MainWindow(Frame):
@@ -78,10 +79,10 @@ class InteractivePopup(Toplevel):
     def make_widgets(self):
         # frames
         self.top_frame = Frame(self)
-        self.top_frame.configure(highlightbackground='red', highlightthickness=5)
+        # self.top_frame.configure(highlightbackground='red', highlightthickness=5)
         self.top_frame.pack(side=TOP, fill=BOTH, expand=TRUE)
         self.mid_frame = Frame(self)
-        self.mid_frame.configure(highlightbackground='yellow', highlightthickness=5)
+        # self.mid_frame.configure(highlightbackground='yellow', highlightthickness=5)
         self.mid_frame.pack(side=TOP, pady=0, fill=BOTH)
         self.bottom_frame = Frame(self)
         self.bottom_frame.pack()
@@ -92,7 +93,7 @@ class InteractivePopup(Toplevel):
         label.pack()
 
         label_menu = Label(self.top_frame, text="Configurations")
-        label_menu.pack(side=BOTTOM, anchor=W, padx=30)
+        label_menu.pack(side=BOTTOM, anchor=W, padx=20)
 
         # Drop-down menu
         self.drop_down_menu = OptionMenu(self.mid_frame, self.tk_var, *self.list_of_configs, command=self.dropdown_changed)
@@ -148,13 +149,18 @@ class InteractivePopup(Toplevel):
     def ok_button_pressed(self):
         if self.tk_var.get() in os.listdir("../configs/automatic_testing") or \
                 self.tk_var.get() in os.listdir("../configs/interactive"):
-            self.master.master.wm_state('iconic')
+            #self.master.master.wm_state('iconic')
             self.destroy()
             if self.interactive_mode:
-                simulate.Simulate('..\\configs\\interactive\\'+str(self.tk_var.get()))
+                #simulate.Simulate('..\\configs\\interactive\\'+str(self.tk_var.get()))
+                #os.system("simulate.py ..\\configs\\automatic_testing\\"+str(self.tk_var.get()))
+                #subprocess.call(['C:\\Users\\Thomas\\PycharmProjects\\Simulation\\venv\\Scripts\\python.exe', "simulate.py", '..\\configs\\interactive\\'+str(self.tk_var.get())])
+                os.system("..\\venv\\Scripts\\python.exe simulate.py ..\\configs\\interactive\\"+str(self.tk_var.get())+"& @pause")
             else:
-                automatic_testing.Tester('..\\configs\\automatic_testing\\'+str(self.tk_var.get()))
-            self.master.master.deiconify()
+                os.system("..\\venv\\Scripts\\python.exe automatic_testing.py ..\\configs\\automatic_testing\\" + str(
+                    self.tk_var.get()) + "& @pause")
+                #automatic_testing.Tester('..\\configs\\automatic_testing\\'+str(self.tk_var.get()))
+            #self.master.master.deiconify()
 
     def edit_button_pressed(self):
         if self.tk_var.get() in self.example_configs:
@@ -199,9 +205,7 @@ if __name__=='__main__':
 
     def get_geometry(w, h):
         ws = root.winfo_screenwidth()
-        print(ws)
         hs = root.winfo_screenheight()
-        print(hs)
         x = int((ws / 2) - (w / 2))
         y = int((hs / 2) - (h / 2))
         return f'{w}x{h}+{x}+{y}'
@@ -212,6 +216,3 @@ if __name__=='__main__':
     window = MainWindow(root)
 
     root.mainloop()
-
-
-

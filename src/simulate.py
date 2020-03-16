@@ -4,11 +4,12 @@ import time
 import cursor
 from os import system
 import configparser
+import sys
 
 
 ########################
 # CHOOSE A CONFIG FILE TO BE USED - OR MAKE YOUR OWN:
-cfg_file = '../configs/my_config.ini'
+cfg_file = '../configs/interactive/my_config.ini'
 # cfg_file = '../configs/mice_and_owls.ini'
 # cfg_file = '../configs/only_mice.ini'
 ########################
@@ -34,13 +35,17 @@ class Simulate:
                 slow_mode = True
             elif keyboard.is_pressed('Right'):
                 slow_mode = False
+            elif keyboard.is_pressed('r'):
+                Simulate(sys.argv[1])
+                break
             elif keyboard.is_pressed('q'):
-                environment.clear_screen()
-                environment.restart_cursor()
                 break
             if slow_mode:
                 time.sleep(slow_mode_sleep_time)
 
 
 if __name__ == '__main__':
-    Simulate(cfg_file)
+    try:
+        Simulate(sys.argv[1])
+    except IndexError:
+        Simulate(cfg_file)

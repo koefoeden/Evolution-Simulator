@@ -3,6 +3,7 @@ import copy
 from random import shuffle, randint
 from typing import Tuple
 from termcolor import colored
+from os import system
 
 
 def restart_cursor():
@@ -63,6 +64,12 @@ class Environment:
         # INITIALIZE
         self.add_animals()
         self.add_grass_and_rocks()
+
+    def set_console_size(self):
+        console_width = max(6*self.dimensions+8, 50)
+        console_height = self.dimensions+15
+
+        system(f'mode con: cols={console_width} lines={console_height}')
 
     def add_animal_at(self, animal: str, tile, parents=None):
         if animal == "mouse":
@@ -203,6 +210,8 @@ class Environment:
         return [avg_speed_mice, avg_speed_owls]
 
     def print_board(self):
+        print(colored(" Tick: {}         ".format(self.tick_no), attrs=['bold']))
+        print()
         print(" "*4, end='')
         for i in range(self.dimensions):
             print("{:^{}}".format(i+1, self.field_size), end=' ')
@@ -219,28 +228,26 @@ class Environment:
 
     def print_controls(self):
         print(' Controls:')
-        print(" Space       -> Advance the simulation.")
-        print(" Right arrow -> Increase simulation speed.")
-        print(" Left arrow  -> Decrease simulation speed.")
+        print(" Space       -> Advance the simulation")
+        print(" Right arrow -> Increase simulation speed")
+        print(" Left arrow  -> Decrease simulation speed")
+        print(" r           -> Restart simulation")
         print(" q           -> Quit simulation")
 
     def print_all(self):
-        print()
         self.print_board()
         print()
         self.print_info()
         print()
         self.print_controls()
 
-
     def print_initial_tick(self):
+        self.set_console_size()
         clear_screen()
         restart_cursor()
-        print(colored(" Initial board", attrs=['bold']))
         self.print_all()
 
     def tick_and_print(self):
         restart_cursor()
         self.tick()
-        print(colored(" Tick: {}         ".format(self.tick_no), attrs=['bold']))
         self.print_all()

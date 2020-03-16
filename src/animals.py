@@ -2,6 +2,8 @@ import environment
 from random import randint, shuffle
 from typing import Tuple, List
 from termcolor import colored
+from os import system
+import time
 
 
 class Animal:
@@ -31,7 +33,10 @@ class Animal:
             self.preg_time = int(self.env.config_parser['OWLS']['o_preg_time'])
             self.max_age = int(self.env.config_parser['OWLS']['o_max_age'])
 
-        self.time_since_eaten = randint(0, self.die_of_hunger-1)
+        if self.env.in_medias_res and self.die_of_hunger != 0:
+            self.time_since_eaten = randint(0, self.die_of_hunger-1)
+        else:
+            self.time_since_eaten = 0
 
         # inheritance
         if parents and self.env.config_parser['INHERITANCE'].getboolean('speed'):
@@ -40,10 +45,15 @@ class Animal:
             self.speed = randint(1, 100)
 
     def string_speed(self):
-        if environment.Environment.field_size < 5:
-            if len(str(self.speed)) > environment.Environment.field_size:
+        field_size = environment.Environment.field_size
+        if field_size < 5:
+            if len(str(self.speed)) > field_size:
                 environment.Environment.field_size += 1
-            return str(self.speed).zfill(environment.Environment.field_size)
+                #self.env.set_console_size()
+                #time.sleep(0.5)
+                #nvironment.clear_screen()
+                #environment.restart_cursor()
+            return str(self.speed).zfill(field_size)
         else:
             return '{:.0e}'.format(self.speed)
 
