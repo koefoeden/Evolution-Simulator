@@ -8,10 +8,8 @@ import sys
 
 
 ########################
-# CHOOSE A CONFIG FILE TO BE USED - OR MAKE YOUR OWN:
+# CHOOSE A CONFIG FILE TO BE USED WHEN FILE RUN DIRECTLY:
 cfg_file = '../configs/interactive/my_config.ini'
-# cfg_file = '../configs/mice_and_owls.ini'
-# cfg_file = '../configs/only_mice.ini'
 ########################
 
 
@@ -36,7 +34,10 @@ class Simulate:
             elif keyboard.is_pressed('Right'):
                 slow_mode = False
             elif keyboard.is_pressed('r'):
-                Simulate(sys.argv[1])
+                try:
+                    Simulate(sys.argv[1])
+                except IndexError:
+                    Simulate(cfg_file)
                 break
             elif keyboard.is_pressed('q'):
                 break

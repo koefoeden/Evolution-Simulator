@@ -1,10 +1,6 @@
 import tkinter as tk
 import animals
-
-
 #from PIL import Image
-
-
 
 class View:
     def __init__(self, env):

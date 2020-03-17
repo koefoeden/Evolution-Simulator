@@ -1,40 +1,51 @@
 import pandas as pd
 import os
+import sci
 
 
 class Analyzer:
     def __init__(self, data_file):
         # read data
         self.df = pd.read_csv(data_file)
+        self.grouped_dataframe = self.make_grouped_results()
 
+    def make_grouped_results(self):
         # determine groupings
-        self.column_list = list(self.df)
-        self.remove_list = ['avg_speed_mouse', 'avg_speed_owl']
-        self.group_by_list = [x for x in self.column_list if x not in self.remove_list]
+        column_list = list(self.df)
+        remove_list = ['avg_speed_mouse', 'avg_speed_owl']
+        group_by_list = [x for x in column_list if x not in remove_list]
 
         # make group object
-        self.df_config_groups = self.df.groupby(self.group_by_list)
+        df_config_groups = self.df.groupby(group_by_list)
 
         # Get average speed, and non-NA and full count within each group.
-        self.df_average_speeds = self.df_config_groups[['avg_speed_mouse', 'avg_speed_owl']].mean()
-        self.df_non_na_count_mice = self.df_config_groups['avg_speed_mouse'].count().reset_index(name='non_NA_count_mice')
-        self.df_non_na_count_owls = self.df_config_groups['avg_speed_owl'].count().reset_index(name='non_NA_count_owls')
+        df_average_speeds = df_config_groups[['avg_speed_mouse', 'avg_speed_owl']].mean()
+        df_non_na_count_mice = df_config_groups['avg_speed_mouse'].count().reset_index(name='non_NA_count_mice')
+        df_non_na_count_owls = df_config_groups['avg_speed_owl'].count().reset_index(name='non_NA_count_owls')
 
-        self.df_full_count = self.df_config_groups['avg_speed_mouse'].size().reset_index(name='repetitions')
+        df_full_count = df_config_groups['avg_speed_mouse'].size().reset_index(name='repetitions')
 
         # merge columns and calculate NA-fraction
-        self.df_merged = pd.merge(self.df_average_speeds, self.df_non_na_count_mice, on=self.group_by_list)
-        self.df_merged2 = pd.merge(self.df_merged, self.df_non_na_count_owls, on=self.group_by_list)
+        df_merged = pd.merge(df_average_speeds, df_non_na_count_mice, on=group_by_list)
+        df_merged2 = pd.merge(df_merged, df_non_na_count_owls, on=group_by_list)
 
-        self.df_final = pd.merge(self.df_merged2, self.df_full_count, on=self.group_by_list)
-        self.df_final['NA_fraction_mice'] = 1 - (self.df_final['non_NA_count_mice']/self.df_final['repetitions'])
-        self.df_final['NA_fracion_owls'] = 1 - (self.df_final['non_NA_count_owls']/self.df_final['repetitions'])
+        df_final = pd.merge(df_merged2, df_full_count, on=group_by_list)
+        df_final['NA_fraction_mice'] = 1 - (df_final['non_NA_count_mice']/df_final['repetitions'])
+        df_final['NA_fraction_owls'] = 1 - (df_final['non_NA_count_owls']/df_final['repetitions'])
 
-        self.df_final_rounded = self.df_final.round(2)
+        df_final_rounded = df_final.round(2)
 
-        # print to csv
-        self.df_final_rounded.to_csv('../results/grouped_results.csv', index=False)
+        df_final_rounded.to_csv('../results/grouped_results.csv', index=False)
+
+        return df_final_rounded
+
+    def get_filtered_grouped_results(self):
+        df = self.grouped_dataframe
+        filtered_df = df.loc[df['NA_fraction_owls'] < 0.5]
+        return filtered_df
 
 
 if __name__ == "__main__":
     analyzer = Analyzer("../results/automatic_testing.csv")
+    analyzer.get_filtered_grouped_results().to_csv('../results/filtered.csv', index=False)
+

@@ -12,14 +12,14 @@ class Animal:
 
     def __init__(self, x_y: Tuple[int, int], parents: List, env):
         self.position = x_y
+        self.parents = parents
+        self.env = env
         self.is_pregnant = False
         self.is_pregnant_with = None
         self.time_pregnant = 0
         self.sex = Animal.sex_dict[randint(0, 1)]
         self.age = 0
-        self.parents = parents
         self.color = None
-        self.env = env
         self.has_moved = False
         self.adj_legal_tiles = self.get_adj_legal_tiles()
 
@@ -45,15 +45,10 @@ class Animal:
             self.speed = randint(1, 100)
 
     def string_speed(self):
-        field_size = environment.Environment.field_size
-        if field_size < 5:
-            if len(str(self.speed)) > field_size:
-                environment.Environment.field_size += 1
-                #self.env.set_console_size()
-                #time.sleep(0.5)
-                #nvironment.clear_screen()
-                #environment.restart_cursor()
-            return str(self.speed).zfill(field_size)
+        if self.env.field_size < 5:
+            if len(str(self.speed)) > self.env.field_size:
+                self.env.field_size += 1
+            return str(self.speed).zfill(self.env.field_size)
         else:
             return '{:.0e}'.format(self.speed)
 

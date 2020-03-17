@@ -16,33 +16,35 @@ def clear_screen():
 
 class Tile:
     def __init__(self, x: int, y: int, env):
+        self.env = env
         self.position = (x, y)
         self.rock = False
         self.animal = None
         self.grass = False
 
         if env.in_medias_res:
-            self.time_since_grass_eaten = randint(0, env.grass_grow_back)
+            self.time_since_grass_eaten = randint(0, self.env.grass_grow_back)
         else:
             self.time_since_grass_eaten = 0
 
     def __str__(self):
         if self.rock:
-            return colored("[" + "-"*(Environment.field_size - 2) + "]", color='white')
+            return colored("[" + "-"*(self.env.field_size - 2) + "]", color='white')
         elif self.animal and self.grass:
             return self.animal.__str__()
         elif self.animal and not self.grass:
             return self.animal.__str__()
         elif not self.animal and self.grass:
-            return colored("M" * Environment.field_size, color='green')
+            return colored("M" * self.env.field_size, color='green')
         else:
-            return ' ' * Environment.field_size
+            return ' ' * self.env.field_size
 
 
 class Environment:
     field_size = 3
 
     def __init__(self, config_parser):
+        self.field_size = Environment.field_size
         self.config_parser = config_parser
         self.start_mice = int(self.config_parser['MICE']['m_number'])
         self.start_owls = int(self.config_parser['OWLS']['o_number'])
@@ -116,14 +118,14 @@ class Environment:
         x, y = x_y
         return (x >= 0) and (y >= 0) and (x < self.dimensions) and (y < self.dimensions)
 
-    def animal_move_to(self, animal, tile):
+    def animal_move_to(self, animal, dest_tile):
         self.clear_field_of_animal(animal)
-        animal.position = tile.position
-        tile.animal = animal
+        animal.position = dest_tile.position
+        dest_tile.animal = animal
         if isinstance(animal, animals.Mouse):
-            if tile.grass:
-                tile.grass = False
-                tile.time_since_grass_eaten = 0
+            if dest_tile.grass:
+                dest_tile.grass = False
+                dest_tile.time_since_grass_eaten = 0
                 animal.time_since_eaten = 0
 
     def clear_field_of_animal(self, animal):
