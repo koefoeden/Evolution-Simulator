@@ -83,13 +83,13 @@ class Tester:
         single_run_time = self.run_simulations(single_run=True)
         answer = input(f"You have selected {num_of_simulations}"
                        f" simulations to be run at {self.config_dict['AUTO_TESTING']['ticks'][0]} ticks each, based on"
-                       f" {self.num_of_configs} different configurations. This will take approximately"
-                       f" {round(single_run_time*num_of_simulations/60,2)} minutes to perform. Do you wish to continue? y/n:")
+                       f" {self.num_of_configs} different configurations.\nThis will take approximately"
+                       f" {round(single_run_time*num_of_simulations/60,2)} minutes to perform.\n\nDo you wish to continue? y/n:")
         return answer == 'y'
 
     def run_simulations(self, single_run=False):
         if not single_run:
-            print('Running simulations... Can be stopped at any time.')
+            print('\nRunning simulations... Can be stopped at any time.', end='')
 
         t0 = time.time()
 
@@ -122,8 +122,8 @@ class Tester:
                                         return t1-t0
 
         full_simulation_time = time.time()
-        print(f'Testing completed in {round((full_simulation_time - t0) / 60, 2)} minutes. '
-              f'Results appended to {results_file}.')
+        print(f'\n\nTesting completed in {round((full_simulation_time - t0) / 60, 2)} minutes.\n')
+        print(f'Results appended to {results_file}.\n')
 
     def run_single_simulation(self):
         # get specific configuration

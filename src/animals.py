@@ -208,8 +208,7 @@ class Owl(Animal):
 
                 else:
                     mouse_near.action()
-                    if mouse_near.position == mouse_near_position:
-                        # if mouse_tiles[0].animal:
+                    if mouse_tiles[0].animal:
                         mouse_near.mark_as_dead()
                         self.time_since_eaten = 0
                     self.env.animal_move_to(self, mouse_tiles[0])
@@ -223,7 +222,7 @@ class Owl(Animal):
 
                 else:
                     mouse_near.action()
-                    if mouse_near.position == mouse_near_position:
+                    if mouse_tiles[0].animal:
                         mouse_near.mark_as_dead()
                         self.time_since_eaten = 0
                     self.env.animal_move_to(self, mouse_tiles[0])
