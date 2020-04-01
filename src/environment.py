@@ -58,6 +58,7 @@ class Environment:
         self.mice = []
         self.owls = []
         self.tick_no = 0
+        self.step_no = 0
 
         self.fields = [[Tile(x, y, self) for x in range(self.dimensions)] for y in range(self.dimensions)]
         self.mice_alive = 0
@@ -69,7 +70,7 @@ class Environment:
 
     def set_console_size(self):
         console_width = max(6*self.dimensions+8, 50)
-        console_height = self.dimensions+15
+        console_height = self.dimensions+20
 
         system(f'mode con: cols={console_width} lines={console_height}')
 
@@ -114,7 +115,7 @@ class Environment:
                         else:
                             tile.grass = True
 
-    def is_legal_field(self, x_y: Tuple[int, int]):
+    def is_legal_coordinates(self, x_y: Tuple[int, int]):
         x, y = x_y
         return (x >= 0) and (y >= 0) and (x < self.dimensions) and (y < self.dimensions)
 
@@ -132,20 +133,26 @@ class Environment:
         x, y = animal.position
         self.fields[y][x].animal = None
 
-    def owls_tick(self):
+    def owls_tick(self, step_mode=False):
         owls_copy = copy.copy(self.owls)
         shuffle(owls_copy)
         for owl in owls_copy:
-            owl.action()
-            owl.post_action()
+            if not owl.has_moved:
+                owl.action()
+                if step_mode:
+                    self.print_board()
+                    return True
 
-    def mice_tick(self):
+    def mice_tick(self, step_mode=False):
         mice_copy = copy.copy(self.mice)
         mice_copy.sort(key=lambda animal_elm: animal_elm.speed, reverse=True)
         for mouse in mice_copy:
             if not mouse.has_moved:
                 mouse.action()
                 mouse.post_action()
+                if step_mode:
+                    self.print_board()
+                    return True
 
     def update_pregnancies(self):
         for owl in self.owls:
@@ -166,8 +173,8 @@ class Environment:
         for mouse in self.mice:
             mouse.has_moved = False
 
-        # for owl in self.owls:
-        #     owl.has_moved = False
+        for owl in self.owls:
+            owl.has_moved = False
 
     def grow_grass(self):
         for row in self.fields:
@@ -184,6 +191,18 @@ class Environment:
         self.reset_moves()
         self.grow_grass()
         self.tick_no += 1
+        self.step_no = 0
+
+    def step(self):
+        self.step_no += 1
+        if not self.owls_tick(step_mode=True):
+            if not self.mice_tick(step_mode=True):
+                self.update_pregnancies()
+                self.reset_moves()
+                self.grow_grass()
+                self.tick_no += 1
+                self.step_no = 0
+                self.print_board()
 
     def multiple_ticks(self, n):
         for i in range(n):
@@ -212,7 +231,7 @@ class Environment:
         return [avg_speed_mice, avg_speed_owls]
 
     def print_board(self):
-        print(colored(" Tick: {}         ".format(self.tick_no), attrs=['bold']))
+        print(" " + colored(f"Tick: {str(self.tick_no).ljust(5)}  Step: {str(self.step_no).ljust(3)}", attrs=['underline']))
         print()
         print(" "*4, end='')
         for i in range(self.dimensions):
@@ -223,33 +242,40 @@ class Environment:
             for item in row:
                 print(str(item), end=' ')
             print()
+        print()
 
-    def print_info(self):
+    def print_stats(self):
         print(" Mice: {:<5}  Avg. speed: {}".format(self.mice_alive, self.average_speed()[0]))
         print(" Owls: {:<5}  Avg. speed: {}".format(self.owls_alive, self.average_speed()[1]))
+        print()
 
     def print_controls(self):
-        print(' Controls:')
+        print(' '+colored('Controls:', attrs=['underline']))
         print(" Space       -> Advance the simulation")
         print(" Right arrow -> Increase simulation speed")
         print(" Left arrow  -> Decrease simulation speed")
-        print(" r           -> Restart simulation")
-        print(" q           -> Quit simulation")
+        print(" S           -> Enable step-mode")
+        print(" T           -> enable tick-mode")
+        print(" R           -> Restart simulation")
+        print(" Q           -> Quit simulation")
 
-    def print_all(self):
+    def print_board_and_stats(self):
         self.print_board()
-        print()
-        self.print_info()
-        print()
-        self.print_controls()
-
-    def print_initial_tick(self):
-        self.set_console_size()
-        clear_screen()
-        restart_cursor()
-        self.print_all()
+        self.print_stats()
 
     def tick_and_print(self):
         restart_cursor()
         self.tick()
-        self.print_all()
+        self.print_board_and_stats()
+
+    def step_and_print(self):
+        restart_cursor()
+        self.step()
+        self.print_stats()
+
+    def print_initial_board(self):
+        self.set_console_size()
+        clear_screen()
+        restart_cursor()
+        self.print_board_and_stats()
+        self.print_controls()

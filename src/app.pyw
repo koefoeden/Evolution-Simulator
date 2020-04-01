@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import messagebox, OptionMenu
 
-import automatic_testing, simulate
 from tkinterhtml import HtmlFrame
 import os
 import configparser
@@ -153,9 +152,9 @@ class InteractivePopup(Toplevel):
             self.destroy()
             if self.interactive_mode:
                 #simulate.Simulate('..\\configs\\interactive\\'+str(self.tk_var.get()))
-                #os.system("simulate.py ..\\configs\\automatic_testing\\"+str(self.tk_var.get()))
-                #subprocess.call(['C:\\Users\\Thomas\\PycharmProjects\\Simulation\\venv\\Scripts\\python.exe', "simulate.py", '..\\configs\\interactive\\'+str(self.tk_var.get())])
-                os.system("..\\venv\\Scripts\\python.exe simulate.py ..\\configs\\interactive\\"+str(self.tk_var.get())+"& @pause")
+                #os.system("interactive.py ..\\configs\\automatic_testing\\"+str(self.tk_var.get()))
+                #subprocess.call(['C:\\Users\\Thomas\\PycharmProjects\\Simulation\\venv\\Scripts\\python.exe', "interactive.py", '..\\configs\\interactive\\'+str(self.tk_var.get())])
+                os.system("..\\venv\\Scripts\\python.exe interactive.py ..\\configs\\interactive\\"+str(self.tk_var.get())+"& @pause")
             else:
                 os.system("..\\venv\\Scripts\\python.exe automatic_testing.py ..\\configs\\automatic_testing\\" + str(
                     self.tk_var.get()) + "& @pause")
