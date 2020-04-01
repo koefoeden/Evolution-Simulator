@@ -1,9 +1,6 @@
-import environment
 from random import randint, shuffle
 from typing import Tuple, List
 from termcolor import colored
-from os import system
-import time
 
 
 class Animal:

@@ -1,11 +1,9 @@
 from tkinter import *
-from tkinter import messagebox, OptionMenu
+from tkinter import OptionMenu
 
 from tkinterhtml import HtmlFrame
 import os
-import configparser
 from shutil import copyfile
-import subprocess
 
 
 class MainWindow(Frame):
@@ -148,18 +146,11 @@ class InteractivePopup(Toplevel):
     def ok_button_pressed(self):
         if self.tk_var.get() in os.listdir("../configs/automatic_testing") or \
                 self.tk_var.get() in os.listdir("../configs/interactive"):
-            #self.master.master.wm_state('iconic')
-            self.destroy()
             if self.interactive_mode:
-                #simulate.Simulate('..\\configs\\interactive\\'+str(self.tk_var.get()))
-                #os.system("interactive.py ..\\configs\\automatic_testing\\"+str(self.tk_var.get()))
-                #subprocess.call(['C:\\Users\\Thomas\\PycharmProjects\\Simulation\\venv\\Scripts\\python.exe', "interactive.py", '..\\configs\\interactive\\'+str(self.tk_var.get())])
                 os.system("..\\venv\\Scripts\\python.exe interactive.py ..\\configs\\interactive\\"+str(self.tk_var.get())+"& @pause")
             else:
                 os.system("..\\venv\\Scripts\\python.exe automatic_testing.py ..\\configs\\automatic_testing\\" + str(
                     self.tk_var.get()) + "& @pause")
-                #automatic_testing.Tester('..\\configs\\automatic_testing\\'+str(self.tk_var.get()))
-            #self.master.master.deiconify()
 
     def edit_button_pressed(self):
         if self.tk_var.get() in self.example_configs:
