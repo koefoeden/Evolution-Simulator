@@ -12,7 +12,7 @@ class MainWindow(Frame):
         master.title('Evolution Simulator')
         master.geometry(get_geometry(800, 700))
 
-        self.welcome_text = open("../resources/welcome_text.html", 'r').read()
+        self.welcome_text = open("..\\resources\\welcome_text.html", 'r').read()
         self.make_widgets()
 
     def make_widgets(self):
@@ -56,10 +56,10 @@ class InteractivePopup(Toplevel):
         # Example configs
         if self.interactive_mode:
             self.example_configs = ['mice_and_owls.ini', 'only_mice.ini']
-            self.list_of_configs = os.listdir("../configs/interactive")
+            self.list_of_configs = os.listdir("..\\configs\\interactive")
         else:
             self.example_configs = ['mice_and_owls.ini', 'only_mice.ini']
-            self.list_of_configs = os.listdir("../configs/automatic_testing")
+            self.list_of_configs = os.listdir("..\\configs\\automatic_testing")
 
         # menu-selected
         self.tk_var = StringVar(self)
@@ -144,8 +144,8 @@ class InteractivePopup(Toplevel):
                 menu.add_command(label=name, command=lambda value=name: self.tk_var.set(value))
 
     def ok_button_pressed(self):
-        if self.tk_var.get() in os.listdir("../configs/automatic_testing") or \
-                self.tk_var.get() in os.listdir("../configs/interactive"):
+        if self.tk_var.get() in os.listdir("..\\configs/automatic_testing") or \
+                self.tk_var.get() in os.listdir("..\\configs/interactive"):
             if self.interactive_mode:
                 os.system("..\\venv\\Scripts\\python.exe interactive.py ..\\configs\\interactive\\"+str(self.tk_var.get())+"& @pause")
             else:
