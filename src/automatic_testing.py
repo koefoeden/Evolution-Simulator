@@ -87,6 +87,9 @@ class Tester:
                        f" {round(single_run_time*num_of_simulations/60,2)} minutes to perform.\n\nDo you wish to continue? y/n:")
         return answer == 'y'
 
+    def run_1_rep(self):
+        pass
+
     def run_simulations(self, single_run=False):
         if not single_run:
             print('\nRunning simulations... Can be stopped at any time.', end='')
@@ -94,32 +97,34 @@ class Tester:
         t0 = time.time()
 
         for i in range(self.config_dict['AUTO_TESTING']['repetitions'][0]):
+            for value_grass_grow_back in self.config_dict['ENVIRONMENT']['grass_grow_back']:
+                self.config_parser.set("ENVIRONMENT", "grass_grow_back", str(value_grass_grow_back))
 
-            for m_value_hunger in self.config_dict['MICE']['m_die_of_hunger']:
-                self.config_parser.set("MICE", "m_die_of_hunger", str(m_value_hunger))
+                for m_value_hunger in self.config_dict['MICE']['m_die_of_hunger']:
+                    self.config_parser.set("MICE", "m_die_of_hunger", str(m_value_hunger))
 
-                for m_value_preg_time in self.config_dict['MICE']['m_preg_time']:
-                    self.config_parser.set("MICE", "m_preg_time", str(m_value_preg_time))
+                    for m_value_preg_time in self.config_dict['MICE']['m_preg_time']:
+                        self.config_parser.set("MICE", "m_preg_time", str(m_value_preg_time))
 
-                    for m_value_number in self.config_dict['MICE']['m_number']:
-                        self.config_parser.set("MICE", "m_number", str(m_value_number))
+                        for m_value_number in self.config_dict['MICE']['m_number']:
+                            self.config_parser.set("MICE", "m_number", str(m_value_number))
 
-                        for o_value_hunger in self.config_dict['OWLS']['o_die_of_hunger']:
-                            self.config_parser.set("OWLS", "o_die_of_hunger", str(o_value_hunger))
+                            for o_value_hunger in self.config_dict['OWLS']['o_die_of_hunger']:
+                                self.config_parser.set("OWLS", "o_die_of_hunger", str(o_value_hunger))
 
-                            for o_value_preg_time in self.config_dict['OWLS']['o_preg_time']:
-                                self.config_parser.set("OWLS", "o_preg_time", str(o_value_preg_time))
+                                for o_value_preg_time in self.config_dict['OWLS']['o_preg_time']:
+                                    self.config_parser.set("OWLS", "o_preg_time", str(o_value_preg_time))
 
-                                for o_value_number in self.config_dict['OWLS']['o_number']:
-                                    self.config_parser.set("OWLS", "o_number", str(o_value_number))
+                                    for o_value_number in self.config_dict['OWLS']['o_number']:
+                                        self.config_parser.set("OWLS", "o_number", str(o_value_number))
 
-                                    # test config
-                                    self.run_single_simulation()
+                                        # test config
+                                        self.run_single_simulation()
 
-                                    # single test run
-                                    if single_run:
-                                        t1 = time.time()
-                                        return t1-t0
+                                        # single test run
+                                        if single_run:
+                                            t1 = time.time()
+                                            return t1-t0
 
         full_simulation_time = time.time()
         print(f'\n\nTesting completed in {round((full_simulation_time - t0) / 60, 2)} minutes.\n')
@@ -146,7 +151,7 @@ class Tester:
             writer.writerow(row_data)
 
 if __name__=='__main__':
-    try :
+    try:
         Tester(sys.argv[1])
     except IndexError:
         Tester(cfg_file)

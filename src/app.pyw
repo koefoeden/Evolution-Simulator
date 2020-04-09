@@ -190,6 +190,7 @@ class NameInputBox(Toplevel):
         self.master.tk_var.set(self.entry_widget.get()+".ini")
         self.destroy()
 
+
 if __name__=='__main__':
     root = Tk()
 

@@ -1,13 +1,11 @@
 import pandas as pd
-import os
-import sci
 
 
-class Analyzer:
+class Grouper:
     def __init__(self, data_file):
         # read data
         self.df = pd.read_csv(data_file)
-        self.grouped_dataframe = self.make_grouped_results()
+        self.make_grouped_results()
 
     def make_grouped_results(self):
         # determine groupings
@@ -39,13 +37,8 @@ class Analyzer:
 
         return df_final_rounded
 
-    def get_filtered_grouped_results(self):
-        df = self.grouped_dataframe
-        filtered_df = df.loc[df['NA_fraction_owls'] < 0.5]
-        return filtered_df
-
 
 if __name__ == "__main__":
-    analyzer = Analyzer("../results/automatic_testing.csv")
-    analyzer.get_filtered_grouped_results().to_csv('../results/filtered.csv', index=False)
+    grouper = Grouper("../results/automatic_testing.csv")
+
 
