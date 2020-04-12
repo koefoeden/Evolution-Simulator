@@ -131,3 +131,4 @@ dmypy.json
 # Pycharm - self added
 **/.idea/workspace.xml
 **/.idea/tasks.xml
+**/.idea/misc.xml
