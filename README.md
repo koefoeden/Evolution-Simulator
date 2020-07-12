@@ -39,6 +39,6 @@ The tool has two different modes:
 #### Tick_time (only for interactive mode)
 * slow_mode_sleep_time - time between each tick when slow-mode is enabled
 
-#### Auto_testing (only in simulation mode)
+#### Auto_testing (only for simulation mode)
 * ticks - number of ticks desired to be run for the simulation
 * repetitions - number of repetitions to be run for each given configuration
