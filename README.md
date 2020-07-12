@@ -18,9 +18,9 @@ Developed by Thomas Gade Koefoed
 
 ## Variables:
 #### Environment
-dimensions
-rock_chance = 0
-grass_grow_back = 1
+* dimensions - number of vertical and horizontal tiles in the environment
+* rock_chance - the probability that a tile is an obstructive rock
+* grass_grow_back - number of ticks before grass grows back
 
 [MECHANICS]
 rand_catch = True
