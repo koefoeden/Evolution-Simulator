@@ -13,7 +13,7 @@ Developed by Thomas Gade Koefoed
 
 ## How to run:
 1. Install the necessary packages listed in requirements.txt via PIP
-2. Run src/app.py
+2. Run src/app.pyw
 3. Enjoy!
 
 ## Variables:
@@ -41,9 +41,8 @@ Developed by Thomas Gade Koefoed
 * o_max_age
 
 #### Tick_time (only for interactive mode)
-slow_mode_sleep_time - time between each tick when slow-mode is enabled
-
+* slow_mode_sleep_time - time between each tick when slow-mode is enabled
 
 #### Auto_testing (only in simulation mode)
-ticks - number of ticks desired to be run for the simulation
-repetitions - number of repetitions to be run for each given configuration
+* ticks - number of ticks desired to be run for the simulation
+* repetitions - number of repetitions to be run for each given configuration
