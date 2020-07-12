@@ -11,7 +11,7 @@ Hope you enjoy the simulator.
 
 Developed by Thomas Gade Koefoed 
 
-## Instructions:
+## How to run:
 1. Install the necessary packages listed in requirements.txt via PIP
 2. Run src/app.py
 3. Profit!
