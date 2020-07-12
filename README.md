@@ -19,28 +19,31 @@ Developed by Thomas Gade Koefoed
 ## Variables:
 #### Environment
 * dimensions - number of vertical and horizontal tiles in the environment
-* rock_chance - the probability that a tile is an obstructive rock
-* grass_grow_back - number of ticks before grass grows back
+* rock_chance - the probability in percent that a tile is an obstructive rock instead of grass
+* grass_grow_back - number of ticks before grass grows back after being eaten
 
-[MECHANICS]
-rand_catch = True
-in_medias_res = True
+#### Simulation mechanics
+* rand_catch - determines if catching is probability based or deterministic
+* in_medias_res - determines if simulation is started cold or warm
+* rand_variance_trait - the amount in percentage that offspring can vary in the speed trait from the average of its parents
+* speed - determines whether or not the speed trait is inherited
 
-[MICE]
-m_number = 280
-m_die_of_hunger = 0
-m_preg_time = 2
-m_max_age = 0
+#### Mice
+* m_number - number of mice upon start of simulation
+* m_die_of_hunger - number of ticks before a given mouse dies of hunger
+* m_preg_time - number of ticks that a female mouse is pregnant
+* m_max_age - number of ticks before a mouse dies of old age
 
-[OWLS]
-o_number = 50
-o_die_of_hunger = 5
-o_preg_time = 3
-o_max_age = 0
+#### Owls
+* o_number
+* o_die_of_hunger
+* o_preg_time
+* o_max_age
 
-[INHERITANCE]
-rand_variance_trait = 20
-speed = True
+#### Tick_time (only for interactive mode)
+slow_mode_sleep_time - time between each tick when slow-mode is enabled
 
-[TICK_TIME]
-slow_mode_sleep_time = 0.1
+
+#### Auto_testing (only in simulation mode)
+ticks - number of ticks desired to be run for the simulation
+repetitions - number of repetitions to be run for each given configuration
