@@ -5,11 +5,7 @@ Every simulation is based on a number of settings that you will specify before b
 
 The tool has two different modes:
 1. Interactive mode, where you can see evolution working in real-time.
-2. Simulation mode, where you can test a range of different custom configurations, figuring out which variables are important for stimulating evolution. 
-
-Hope you enjoy the simulator.
-
-Developed by Thomas Gade Koefoed 
+2. Simulation mode, where you can test a range of different custom configurations, figuring out which variables are important for stimulating evolution.
 
 ## How to run:
 1. Install the necessary packages listed in requirements.txt via PIP
