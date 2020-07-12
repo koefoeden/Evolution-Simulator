@@ -3,14 +3,15 @@ This tool allows you to simulate the natural process of evolution in a simplifie
 
 Every simulation is based on a number of settings that you will specify before beforehand - or you can choose a pre-determined configuration if you like!
 
-The tool has to different modes:
+The tool has two different modes:
 1. Interactive mode, where you can see evolution working in real-time.
-2. Simulation mode, where you can test a range of different custom configurations, figuring out which variables are important for stimulating evolution. Hope you enjoy it!
+2. Simulation mode, where you can test a range of different custom configurations, figuring out which variables are important for stimulating evolution. 
+
+Hope you enjoy the simulator.
 
 Developed by Thomas Gade Koefoed 
 
-
+## Instructions:
 1. Install the necessary packages listed in requirements.txt via PIP
 2. Run src/app.py
-
-More info to come.
+3. Profit!
