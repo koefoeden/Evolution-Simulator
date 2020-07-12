@@ -14,4 +14,33 @@ Developed by Thomas Gade Koefoed
 ## How to run:
 1. Install the necessary packages listed in requirements.txt via PIP
 2. Run src/app.py
-3. Profit!
+3. Enjoy!
+
+## Variables:
+#### Environment
+dimensions
+rock_chance = 0
+grass_grow_back = 1
+
+[MECHANICS]
+rand_catch = True
+in_medias_res = True
+
+[MICE]
+m_number = 280
+m_die_of_hunger = 0
+m_preg_time = 2
+m_max_age = 0
+
+[OWLS]
+o_number = 50
+o_die_of_hunger = 5
+o_preg_time = 3
+o_max_age = 0
+
+[INHERITANCE]
+rand_variance_trait = 20
+speed = True
+
+[TICK_TIME]
+slow_mode_sleep_time = 0.1
