@@ -9,8 +9,8 @@ The tool has two different modes:
 
 ## How to run:
 1. Install the necessary packages listed in requirements.txt via PIP
-2. Run src/app.pyw
-3. Enjoy!
+2. Navigate to root folder and run "pythonw app.py" for smoothest experience
+3. Follow instructions and enjoy!
 
 ## Variables:
 #### Environment
