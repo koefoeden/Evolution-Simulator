@@ -1,1 +1,1 @@
-start ..\venv\Scripts\pythonw.exe app.pyw
+start C:\Users\Flumm\anaconda3\pythonw.exe app.pyw
