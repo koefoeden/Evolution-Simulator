@@ -54,6 +54,7 @@ class Environment:
         self.in_medias_res = self.config_parser['MECHANICS'].getboolean('in_medias_res')
         self.rand_catch = self.config_parser['MECHANICS'].getboolean('rand_catch')
         self.rand_variance_trait = int(self.config_parser['INHERITANCE']['rand_variance_trait'])
+        self.owls_target_slow_mice = self.config_parser['MECHANICS'].getboolean('owls_target_slow_mice')
 
         self.mice = []
         self.owls = []

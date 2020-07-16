@@ -193,7 +193,11 @@ class Owl(Animal):
         # hunt mice action
         mouse_tiles = self.get_mouse_tiles()
         if mouse_tiles:
-            mouse_tiles.sort(key=lambda tile: tile.animal.speed)
+
+            # owls_target_slow_mice ON
+            if self.env.owls_target_slow_mice:
+                mouse_tiles.sort(key=lambda tile: tile.animal.speed)
+
             mouse_near = mouse_tiles[0].animal
             mouse_near_position = mouse_near.position
 

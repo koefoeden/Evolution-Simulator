@@ -11,7 +11,7 @@ cfg_file = '../configs/automatic_testing/my_config.ini'
 ########################
 # OUTPUT FILE FOR SIMULATION RESULTS
 # IF IT DOESN'T EXIST, A NEW ONE WILL BE CREATED. OTHERWISE DATA WILL BE APPENDED TO.
-results_file = '../results/automatic_testing.csv'
+results_file = 'results/automatic_testing.csv'
 ########################
 
 
