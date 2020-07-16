@@ -4,6 +4,8 @@ import csv
 import re
 import time
 import sys
+import multiprocessing
+
 
 ########################
 # CONFIG FILE TO BE USED FOR SIMULATION
@@ -20,6 +22,7 @@ class Tester:
         self.cfg_file_name = cfg_file_param
         self.config_parser = configparser.ConfigParser()
         self.config_parser.read(self.cfg_file_name)
+        self.multicore_mode = self.config_parser['AUTO_TESTING'].getboolean("multi-core_mode")
         self.regex_range = r"([0-9]+)[^0-9]*([0-9]*)[^0-9]*([0-9]*)"
 
         # set config values
@@ -61,8 +64,8 @@ class Tester:
                 for section in self.config_parser.sections():
                     for (key, val) in self.config_parser.items(section):
                         header.append(key)
-                header.remove('repetitions')
-                header.extend(['avg_speed_mouse', 'avg_speed_owl'])
+                header.remove(['repetitions', 'multi-core_mode'])
+                header.extend(['avg_speed_mouse', 'avg_speed_owl', 'sim ver'])
 
                 writer = csv.writer(csv_file, delimiter=',')
                 writer.writerow(header)
@@ -91,6 +94,7 @@ class Tester:
         pass
 
     def run_simulations(self, single_run=False):
+        processes = []
         if not single_run:
             print('\nRunning simulations... Can be stopped at any time.', end='')
 
@@ -118,13 +122,26 @@ class Tester:
                                     for o_value_number in self.config_dict['OWLS']['o_number']:
                                         self.config_parser.set("OWLS", "o_number", str(o_value_number))
 
-                                        # test config
-                                        self.run_single_simulation()
+                                        for rand_variance_trait_value in self.config_dict['INHERITANCE']['rand_variance_trait']:
+                                            self.config_parser.set("INHERITANCE", "rand_variance_trait", str(rand_variance_trait_value))
 
-                                        # single test run
-                                        if single_run:
-                                            t1 = time.time()
-                                            return t1-t0
+                                            if single_run:
+                                                self.run_single_simulation()
+                                                t1 = time.time()
+                                                return t1 - t0
+
+                                            else:
+                                                # MULTICORE ENABLED
+                                                if self.multicore_mode:
+                                                    p = multiprocessing.Process(target=self.run_single_simulation)
+                                                    processes.append(p)
+                                                    p.start()
+
+                                                else:
+                                                    self.run_single_simulation()
+
+        for process in processes:
+            process.join()
 
         full_simulation_time = time.time()
         print(f'\n\nTesting completed in {round((full_simulation_time - t0) / 60, 2)} minutes.\n')
@@ -142,8 +159,9 @@ class Tester:
         object_environment = environment.Environment(self.config_parser)
         object_environment.multiple_ticks(self.config_dict['AUTO_TESTING']['ticks'][0])
 
-        # add average speed to row data
+        # add average speed and simulation version to row data
         row_data.extend(object_environment.average_speed())
+        row_data.append(object_environment.sim_version)
 
         # write full row data into file
         with open(results_file, 'a+', newline='') as csv_file:

@@ -41,9 +41,11 @@ class Tile:
 
 
 class Environment:
+    sim_version = 1.00
     field_size = 3
 
     def __init__(self, config_parser):
+        self.sim_version = Environment.sim_version
         self.field_size = Environment.field_size
         self.config_parser = config_parser
         self.start_mice = int(self.config_parser['MICE']['m_number'])
