@@ -213,8 +213,8 @@ class NameInputBox(Toplevel):
         self.destroy()
 
 
-if __name__=='__main__':
-    root = Tk()
+def main():
+    global get_geometry
 
     def get_geometry(w, h):
         ws = root.winfo_screenwidth()
@@ -223,9 +223,19 @@ if __name__=='__main__':
         y = int((hs / 2) - (h / 2))
         return f'{w}x{h}+{x}+{y}'
 
+    root = Tk()
     root.tk_setPalette(background='white', foreground='black',
                        activeBackground='gray', activeForeground='black')
 
     window = MainWindow(root)
 
     root.mainloop()
+
+
+
+if __name__=='__main__':
+    main()
+
+
+
+
