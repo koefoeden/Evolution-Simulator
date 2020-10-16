@@ -1,5 +1,4 @@
 from unittest import TestCase
-import animals
 import environment
 import configparser
 

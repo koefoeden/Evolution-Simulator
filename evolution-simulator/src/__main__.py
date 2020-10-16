@@ -17,7 +17,7 @@ class MainWindow(Frame):
         master.geometry(get_geometry(700, 500))
         # abs_path = os.path.abspath('resources/welcome_text.html')
         #print(os.getcwd())
-        self.welcome_text = open('resources/welcome_text.html', 'r').read()
+        self.welcome_text = open('../resources/welcome_text.html', 'r').read()
         self.make_widgets()
 
     def make_widgets(self):
@@ -73,10 +73,10 @@ class InteractivePopup(Toplevel):
         # Example configs
         if self.interactive_mode:
             self.example_configs = ['mice_and_owls.ini', 'only_mice.ini']
-            self.list_of_configs = os.listdir("configs/interactive")
+            self.list_of_configs = os.listdir("../configs/interactive")
         else:
             self.example_configs = ['mice_and_owls.ini', 'only_mice.ini']
-            self.list_of_configs = os.listdir("configs/automatic_testing")
+            self.list_of_configs = os.listdir("../configs/automatic_testing")
 
         # menu-selected
         self.tk_var = StringVar(self)
@@ -153,16 +153,16 @@ class InteractivePopup(Toplevel):
         menu = self.drop_down_menu["menu"]
         menu.delete(0, "end")
         if self.interactive_mode:
-            for name in os.listdir("configs/interactive"):
+            for name in os.listdir("../configs/interactive"):
                 menu.add_command(label=name, command=lambda value=name: self.tk_var.set(value))
                 #self.drop_down_menu.configure(command=self.dropdown_changed)
         else:
-            for name in os.listdir("configs/automatic_testing"):
+            for name in os.listdir("../configs/automatic_testing"):
                 menu.add_command(label=name, command=lambda value=name: self.tk_var.set(value))
 
     def ok_button_pressed(self):
-        if self.tk_var.get() in os.listdir("configs/automatic_testing") or \
-                self.tk_var.get() in os.listdir("configs/interactive"):
+        if self.tk_var.get() in os.listdir("../configs/automatic_testing") or \
+                self.tk_var.get() in os.listdir("../configs/interactive"):
             if self.interactive_mode:
                 #os.system("..\\venv\\Scripts\\python.exe interactive.py ..\\configs\\interactive\\"+str(self.tk_var.get())+"& @pause")
                 #print(self.tk_var.get())
@@ -204,10 +204,10 @@ class NameInputBox(Toplevel):
 
     def ok_button_pressed(self, event=None):
         if self.master.interactive_mode:
-            copyfile("configs/interactive/mice_and_owls.ini",
+            copyfile("../configs/interactive/mice_and_owls.ini",
                      "configs\\interactive\\" + self.entry_widget.get() +".ini")
         else:
-            copyfile("configs/automatic_testing/mice_and_owls.ini",
+            copyfile("../configs/automatic_testing/mice_and_owls.ini",
                      "configs\\automatic_testing\\" + self.entry_widget.get() + ".ini")
         self.master.tk_var.set(self.entry_widget.get()+".ini")
         self.destroy()

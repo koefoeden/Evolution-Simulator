@@ -1,3 +1,3 @@
-recursive-include resources *
-recursive-include configs *
-include *.py
+recursive-include evolution-simulator/resources *
+recursive-include evolution-simulator/configs *
+recursive-include evolution-simulator/src *
