@@ -1,3 +1,2 @@
-recursive-include evolution-simulator/resources *
-recursive-include evolution-simulator/configs *
-recursive-include evolution-simulator/src *
+recursive-include evolutionsimulator/resources *
+recursive-include evolutionsimulator/configs *
