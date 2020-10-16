@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="evolution-simulator",
-    version="0.1.4",
+    version="0.1.5",
     description="Simulate evolution",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -29,7 +29,7 @@ setup(
                       "tkinterhtml<=0.7"],
     entry_points={
         "console_scripts": [
-            "simulate=evolution-simulator.src.__main__:main",
+            "simulate=evolution-simulator.__main__:main",
         ]
     },
 )
