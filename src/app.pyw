@@ -144,8 +144,8 @@ class InteractivePopup(Toplevel):
                 menu.add_command(label=name, command=lambda value=name: self.tk_var.set(value))
 
     def ok_button_pressed(self):
-        if self.tk_var.get() in os.listdir("..\\configs/automatic_testing") or \
-                self.tk_var.get() in os.listdir("..\\configs/interactive"):
+        if self.tk_var.get() in os.listdir("..\\configs\\automatic_testing") or \
+                self.tk_var.get() in os.listdir("..\\configs\\interactive"):
             if self.interactive_mode:
                 os.system("..\\venv\\Scripts\\python.exe interactive.py ..\\configs\\interactive\\"+str(self.tk_var.get())+"& @pause")
             else:
