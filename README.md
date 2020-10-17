@@ -1,4 +1,6 @@
 ![Image of app](https://imgur.com/8obpdcW.png)
+An image of the interactive simulation environment.
+
 # Welcome to the Evolution Simulator!
 This tool allows you to simulate the natural process of evolution in a simplified, artificial environment. Essentially, the tool simulates an environment filled with mice and owls. The mice strive to survive by eating grass, while the owls prey on the mice. Both animals are capable of propagating and pass down their genes to the offspring. Let evolution do its work, and see the marvelous effects of natural selection!
 
@@ -10,12 +12,20 @@ The tool has two different modes:
 
 In the environment, male and female mice are coloured dark and light blue respectively, while male and female owls are colored red and orange respectively. Each animal is given a number, indicating its level of speed. If the number is underlined, it means the animal is currently pregant, and will soon produce offspring.
 
-## How to run:
-1. Install the necessary packages listed in requirements.txt via PIP
-2. Navigate to root folder and run "pythonw app.py" for smoothest experience
-3. Follow instructions and enjoy!
+## Installation and usage
+Install the package through PyPi:
 
-## Variables:
+`pip install evolutionsimulator`
+
+Run it in your terminal through the following command:
+
+`simulate`
+
+Voilá, the GUI will take you on from there.
+
+## Variables
+Below is a list of the settings for each simulation that you can explore.
+
 #### Environment
 * dimensions - number of vertical and horizontal tiles in the environment
 * rock_chance - the probability in percent that a tile is an obstructive rock instead of grass
@@ -34,6 +44,7 @@ In the environment, male and female mice are coloured dark and light blue respec
 * m_max_age - number of ticks before a mouse dies of old age
 
 #### Owls
+Same as for mice above
 * o_number
 * o_die_of_hunger
 * o_preg_time
