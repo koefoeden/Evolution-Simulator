@@ -10,10 +10,9 @@ The tool has two different modes:
 
 In the environment, male and female mice are coloured dark and light blue respectively, while male and female owls are colored red and orange respectively. Each animal is given a number, indicating its level of speed. If the number is underlined, it means the animal is currently pregant, and will soon produce offspring.
 
-## How to run:
-1. Install the necessary packages listed in requirements.txt via PIP
-2. Navigate to root folder and run "pythonw app.py" for smoothest experience
-3. Follow instructions and enjoy!
+## Installation and usage
+pip install evolutionsimulator
+simulate
 
 ## Variables:
 #### Environment
