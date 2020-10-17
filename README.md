@@ -1,4 +1,6 @@
 ![Image of app](https://imgur.com/8obpdcW.png)
+An image of the interactive simulation environment.
+
 # Welcome to the Evolution Simulator!
 This tool allows you to simulate the natural process of evolution in a simplified, artificial environment. Essentially, the tool simulates an environment filled with mice and owls. The mice strive to survive by eating grass, while the owls prey on the mice. Both animals are capable of propagating and pass down their genes to the offspring. Let evolution do its work, and see the marvelous effects of natural selection!
 
@@ -12,9 +14,11 @@ In the environment, male and female mice are coloured dark and light blue respec
 
 ## Installation and usage
 Install the package through PyPi:
+
 `pip install evolutionsimulator`
 
 Run it in your terminal through the following command:
+
 `simulate`
 
 Voilá, the GUI will take you on from there.
