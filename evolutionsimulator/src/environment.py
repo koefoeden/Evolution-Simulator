@@ -41,9 +41,11 @@ class Tile:
 
 
 class Environment:
+    sim_version = 1.00
     field_size = 3
 
     def __init__(self, config_parser):
+        self.sim_version = Environment.sim_version
         self.field_size = Environment.field_size
         self.config_parser = config_parser
         self.start_mice = int(self.config_parser['MICE']['m_number'])
@@ -54,6 +56,7 @@ class Environment:
         self.in_medias_res = self.config_parser['MECHANICS'].getboolean('in_medias_res')
         self.rand_catch = self.config_parser['MECHANICS'].getboolean('rand_catch')
         self.rand_variance_trait = int(self.config_parser['INHERITANCE']['rand_variance_trait'])
+        self.owls_target_slow_mice = self.config_parser['MECHANICS'].getboolean('owls_target_slow_mice')
 
         self.mice = []
         self.owls = []

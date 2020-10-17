@@ -68,4 +68,5 @@ if __name__ == '__main__':
     try:
         InteractiveSimulator(sys.argv[1])
     except IndexError:
+        print(f"Running simulation using {cfg_file}")
         InteractiveSimulator(cfg_file)
