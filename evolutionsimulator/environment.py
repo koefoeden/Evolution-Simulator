@@ -120,7 +120,7 @@ class Environment:
 
     def is_legal_coordinates(self, x_y: Tuple[int, int]):
         x, y = x_y
-        return (x >= 0) and (y >= 0) and (x < self.dimensions) and (y < self.dimensions)
+        return (0 <= x < self.dimensions) and (0 <= y < self.dimensions)
 
     def animal_move_to(self, animal, dest_tile):
         self.clear_field_of_animal(animal)
@@ -234,7 +234,8 @@ class Environment:
         return [avg_speed_mice, avg_speed_owls]
 
     def print_board(self):
-        print(" " + colored(f"Tick: {str(self.tick_no).ljust(5)}  Step: {str(self.step_no).ljust(3)}", attrs=['underline']))
+        print(" " + colored(f"Tick: {str(self.tick_no).ljust(5)}  Step: {str(self.step_no).ljust(3)}",
+                            attrs=['underline']))
         print()
         print(" "*4, end='')
         for i in range(self.dimensions):

@@ -1,3 +1,4 @@
+import pkg_resources
 import environment
 import keyboard
 import time
@@ -9,7 +10,7 @@ import sys
 
 ########################
 # CHOOSE A CONFIG FILE TO BE USED WHEN FILE RUN DIRECTLY:
-cfg_file = 'configs/interactive/only_mice.ini'
+cfg_file = pkg_resources.resource_filename('evolutionsimulator', 'configs/interactive/mice_and_owls.ini')
 ########################
 
 
