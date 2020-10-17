@@ -52,6 +52,6 @@ class Grouper:
 
 
 if __name__ == "__main__":
-    grouper = Grouper("../results/automatic_testing.csv")
+    grouper = Grouper("results/automatic_testing.csv")
 
 
