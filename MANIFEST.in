@@ -1,2 +1,4 @@
-recursive-include evolutionsimulator/resources *
 recursive-include evolutionsimulator/configs *
+recursive-include evolutionsimulator/images *
+recursive-include evolutionsimulator/resources *
+recursive-include evolutionsimulator/results empty

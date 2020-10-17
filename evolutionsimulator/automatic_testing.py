@@ -1,3 +1,4 @@
+import pkg_resources
 import environment
 import configparser
 import csv
@@ -10,13 +11,12 @@ from psutil import cpu_count
 
 ########################
 # CONFIG FILE TO BE USED FOR SIMULATION IF CALLED WITHOUT COMMAND LINE ARGUMENT
-cfg_file = '../configs/automatic_testing/my_config.ini'
+cfg_file = pkg_resources.resource_filename('evolutionsimulator', 'configs/automatic_testing/mice_and_owls.ini')
 ########################
 # OUTPUT FILE FOR SIMULATION RESULTS
 # IF IT DOESN'T EXIST, A NEW ONE WILL BE CREATED. OTHERWISE DATA WILL BE APPENDED TO.
-results_file = 'results/automatic_testing.csv'
+results_file = pkg_resources.resource_filename('evolutionsimulator', 'results/automatic_testing.csv')
 ########################
-
 
 class Tester:
     def __init__(self, cfg_file_param):

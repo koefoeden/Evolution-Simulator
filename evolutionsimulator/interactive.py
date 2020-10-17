@@ -9,7 +9,7 @@ import sys
 
 ########################
 # CHOOSE A CONFIG FILE TO BE USED WHEN FILE RUN DIRECTLY:
-cfg_file = '../configs/interactive/my_config.ini'
+cfg_file = 'configs/interactive/only_mice.ini'
 ########################
 
 

@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="evolutionsimulator",
-    version="0.1.10",
+    version="0.1.20",
     description="Simulate evolution",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -21,12 +21,14 @@ setup(
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.7",],
-    packages=["evolutionsimulator.src"],
+    packages=["evolutionsimulator"],
+    package_dir = {"evolutionsimulator": "evolutionsimulator"},
+    package_data = {"evolutionsimulator": ['configs/*', 'images/*', "resources/*", "results/*"]},
     include_package_data=True,
-    install_requires=["colorama<=0.4.3","cursor<=1.3.4", "keyboard<=0.13.4",
-                      "numpy<=1.18.1", "pandas<=1.0.1", "python-dateutil<=2.8.1",
-                      "pytz<=2019.3", "six<=1.14.0", "termcolor<=1.1.0",
-                      "tkinterhtml<=0.7"],
+    install_requires=["colorama>=0.4.3","cursor>=1.3.4", "keyboard>=0.13.4",
+                      "numpy>=1.18.1", "pandas>=1.0.1", "python-dateutil>=2.8.1",
+                      "pytz>=2019.3", "six>=1.14.0", "termcolor>=1.1.0",
+                      "tkinterhtml>=0.7","tk_html_widgets"],
     entry_points={
         "console_scripts": [
             "simulate=evolutionsimulator.__main__:main",

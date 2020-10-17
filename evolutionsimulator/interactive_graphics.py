@@ -6,8 +6,8 @@ class View:
     def __init__(self, env):
         self.env = env
         self.root = tk.Tk()
-        self.owl_image = tk.PhotoImage(file="../Images/owl_image_50.GIF")
-        self.mouse_image = tk.PhotoImage(file="../Images/mouse_resized.pgm")
+        self.owl_image = tk.PhotoImage(file="images/owl_image_50.GIF")
+        self.mouse_image = tk.PhotoImage(file="images/mouse_resized.pgm")
         self.root.geometry("1280x720")
         self.root["bg"] = "black"
 
