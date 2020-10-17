@@ -8,7 +8,6 @@ import sys
 import multiprocessing
 from psutil import cpu_count
 
-
 ########################
 # CONFIG FILE TO BE USED FOR SIMULATION IF CALLED WITHOUT COMMAND LINE ARGUMENT
 cfg_file = pkg_resources.resource_filename('evolutionsimulator', 'configs/automatic_testing/mice_and_owls.ini')
@@ -16,6 +15,8 @@ cfg_file = pkg_resources.resource_filename('evolutionsimulator', 'configs/automa
 # OUTPUT FILE FOR SIMULATION RESULTS
 # IF IT DOESN'T EXIST, A NEW ONE WILL BE CREATED. OTHERWISE DATA WILL BE APPENDED TO.
 results_file = pkg_resources.resource_filename('evolutionsimulator', 'results/automatic_testing.csv')
+
+
 ########################
 
 class Tester:
@@ -33,7 +34,8 @@ class Tester:
             self.config_dict[section] = {}
             for (var_name, val) in self.config_parser.items(section):
                 if val not in ['True', 'False']:
-                    self.config_dict[section][var_name] = self.get_config_values(self.config_parser[str(section)][str(var_name)])
+                    self.config_dict[section][var_name] = self.get_config_values(
+                        self.config_parser[str(section)][str(var_name)])
 
         # Create file for simulation results with header if not exists
         self.create_results_file()
@@ -50,9 +52,9 @@ class Tester:
         max_val = match_instance.group(2)
         jump = match_instance.group(3)
         if jump:
-            return list(range(int(min_val), int(max_val)+1, int(jump)))
+            return list(range(int(min_val), int(max_val) + 1, int(jump)))
         elif max_val:
-            return list(range(int(min_val), int(max_val)+1))
+            return list(range(int(min_val), int(max_val) + 1))
         else:
             return [int(min_val)]
 
@@ -91,16 +93,16 @@ class Tester:
     def confirm_test_prompt(self):
         # Get required numbers for prompt
         self.num_of_configs = self.get_number_of_configs()
-        num_of_simulations = self.num_of_configs*self.config_dict['AUTO_TESTING']['repetitions'][0]
+        num_of_simulations = self.num_of_configs * self.config_dict['AUTO_TESTING']['repetitions'][0]
         single_run_time = self.run_simulations(single_run=True)
         num_cores = cpu_count(logical=False)
 
         # Ask for input
         if self.multicore_mode:
             answer = input(f"You have selected {num_of_simulations}"
-                       f" simulations to be run at {self.config_dict['AUTO_TESTING']['ticks'][0]} ticks each, based on"
-                       f" {self.num_of_configs} different configurations.\nThis will take approximately"
-                       f" {round((single_run_time*num_of_simulations/60)/num_cores,2)} minutes to perform on {num_cores} cores.\n\nDo you wish to continue? y/n:")
+                           f" simulations to be run at {self.config_dict['AUTO_TESTING']['ticks'][0]} ticks each, based on"
+                           f" {self.num_of_configs} different configurations.\nThis will take approximately"
+                           f" {round((single_run_time * num_of_simulations / 60) / num_cores, 2)} minutes to perform on {num_cores} cores.\n\nDo you wish to continue? y/n:")
         else:
             answer = input(f"You have selected {num_of_simulations}"
                            f" simulations to be run at {self.config_dict['AUTO_TESTING']['ticks'][0]} ticks each, based on"
@@ -125,7 +127,8 @@ class Tester:
 
             for i in range(self.config_dict['AUTO_TESTING']['repetitions'][0]):
                 if not single_run:
-                    print(f"Simulating repetition {i+1} of {self.config_dict['AUTO_TESTING']['repetitions'][0]} repetitions for given configs.")
+                    print(
+                        f"Simulating repetition {i + 1} of {self.config_dict['AUTO_TESTING']['repetitions'][0]} repetitions for given configs.")
                 for value_grass_grow_back in self.config_dict['ENVIRONMENT']['grass_grow_back']:
                     self.config_parser.set("ENVIRONMENT", "grass_grow_back", str(value_grass_grow_back))
 
@@ -147,8 +150,10 @@ class Tester:
                                         for o_value_number in self.config_dict['OWLS']['o_number']:
                                             self.config_parser.set("OWLS", "o_number", str(o_value_number))
 
-                                            for rand_variance_trait_value in self.config_dict['INHERITANCE']['rand_variance_trait']:
-                                                self.config_parser.set("INHERITANCE", "rand_variance_trait", str(rand_variance_trait_value))
+                                            for rand_variance_trait_value in self.config_dict['INHERITANCE'][
+                                                'rand_variance_trait']:
+                                                self.config_parser.set("INHERITANCE", "rand_variance_trait",
+                                                                       str(rand_variance_trait_value))
 
                                                 if single_run:
                                                     self.run_single_simulation(csv_file, writer)
@@ -158,7 +163,8 @@ class Tester:
                                                 else:
                                                     # MULTI-CORE ENABLED
                                                     if self.multicore_mode:
-                                                        p = multiprocessing.Process(target=self.run_single_simulation(csv_file, writer))
+                                                        p = multiprocessing.Process(
+                                                            target=self.run_single_simulation(csv_file, writer))
                                                         processes.append(p)
                                                         p.start()
 
@@ -191,11 +197,12 @@ class Tester:
 
         # write full row data into file
         # TODO: Old implementation commented out
-        #with open(results_file, 'a+', newline='') as csv_file:
-        #writer = csv.writer(csv_file, delimiter=',')
+        # with open(results_file, 'a+', newline='') as csv_file:
+        # writer = csv.writer(csv_file, delimiter=',')
         writer.writerow(sim_data)
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     try:
         Tester(sys.argv[1])
     except IndexError:
