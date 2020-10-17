@@ -23,7 +23,9 @@ Run it in your terminal through the following command:
 
 Voilá, the GUI will take you on from there.
 
-## Variables:
+## Variables
+Below is a list of the settings for each simulation that you can explore.
+
 #### Environment
 * dimensions - number of vertical and horizontal tiles in the environment
 * rock_chance - the probability in percent that a tile is an obstructive rock instead of grass
