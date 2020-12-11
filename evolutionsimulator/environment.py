@@ -1,4 +1,4 @@
-import animals
+import evolutionsimulator.animals as animals
 import copy
 from random import shuffle, randint
 from typing import Tuple
