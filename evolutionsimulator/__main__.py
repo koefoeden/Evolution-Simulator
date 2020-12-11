@@ -1,11 +1,8 @@
-import os
 import pkg_resources
 from tkinter import *
 from tkinter import OptionMenu
 from tk_html_widgets import *
-# from src.interactive import  interactive
 import subprocess
-from tkinterhtml import HtmlFrame
 import os
 from shutil import copyfile
 import platform
@@ -14,11 +11,14 @@ RESORUCES = pkg_resources.resource_filename('evolutionsimulator', 'resources/')
 CONFIGS = pkg_resources.resource_filename('evolutionsimulator', 'configs/')
 IMAGES = pkg_resources.resource_filename('evolutionsimulator', 'images/')
 
-print(pkg_resources.resource_filename('evolutionsimulator', 'interac,tive.py',))
+print(pkg_resources.resource_filename('evolutionsimulator', 'interac,tive.py', ))
 
 
 class MainWindow(Frame):
+    """The main window when running the tool."""
+
     def __init__(self, master):
+        """Sets standard options."""
         Frame.__init__(self, master)
         master.title('Evolution Simulator')
         master.geometry(get_geometry(700, 500))
@@ -26,6 +26,7 @@ class MainWindow(Frame):
         self.make_widgets()
 
     def make_widgets(self):
+        """Make all widgets for the main windows"""
         # Frames
         frame_top = Frame(self.master)
         frame_top.pack()
@@ -50,21 +51,24 @@ class MainWindow(Frame):
         button_automatic_testing.pack(side=RIGHT, padx=100, pady=10)
 
     def interactive_button_action(self):
-        InteractivePopup(self, interactive_mode=True)
+        ConfigurationWindow(self, interactive_mode=True)
 
     def automatic_testing_button_action(self):
-        InteractivePopup(self, interactive_mode=False)
+        ConfigurationWindow(self, interactive_mode=False)
 
 
-class InteractivePopup(Toplevel):
+class ConfigurationWindow(Toplevel):
+    """The window to choose the configuration for either interactive or automatic mode"""
+
     def __init__(self, master, interactive_mode=True):
+        """Initialize window."""
         Toplevel.__init__(self, master)
         self.interactive_mode = interactive_mode
         self.title('Choose a configuration')
         self.width = 500
         self.geometry(get_geometry(self.width, 180))
 
-        # Example configs
+        # Get list of configs and set example configs:
         if self.interactive_mode:
             self.example_configs = ['mice_and_owls.ini', 'only_mice.ini']
             self.list_of_configs = os.listdir(os.path.join(CONFIGS, "interactive"))
@@ -73,8 +77,8 @@ class InteractivePopup(Toplevel):
             self.list_of_configs = os.listdir(os.path.join(CONFIGS, "automatic_testing"))
 
         # menu-selected
-        self.tk_var = StringVar(self)
-        self.tk_var.set('Select a config...')
+        self.selected_config = StringVar(self)
+        self.selected_config.set('Select a config...')
 
         self.drop_down_menu = None
         self.edit_button = None
@@ -85,12 +89,12 @@ class InteractivePopup(Toplevel):
         master.wait_window(self)  # pause anything on the main window until this one closes (optional)
 
     def make_widgets(self):
+        """Make widgets"""
+
         # frames
         self.top_frame = Frame(self)
-        # self.top_frame.configure(highlightbackground='red', highlightthickness=5)
         self.top_frame.pack(side=TOP, fill=BOTH, expand=TRUE)
         self.mid_frame = Frame(self)
-        # self.mid_frame.configure(highlightbackground='yellow', highlightthickness=5)
         self.mid_frame.pack(side=TOP, pady=0, fill=BOTH)
         self.bottom_frame = Frame(self)
         self.bottom_frame.pack()
@@ -105,7 +109,7 @@ class InteractivePopup(Toplevel):
         label_menu.pack(side=BOTTOM, anchor=W, padx=20)
 
         # Drop-down menu
-        self.drop_down_menu = OptionMenu(self.mid_frame, self.tk_var, *self.list_of_configs,
+        self.drop_down_menu = OptionMenu(self.mid_frame, self.selected_config, *self.list_of_configs,
                                          command=self.dropdown_changed)
         self.drop_down_menu.pack(side=LEFT, padx=20)
 
@@ -127,21 +131,24 @@ class InteractivePopup(Toplevel):
         self.edit_button.pack(side=RIGHT, padx=10, anchor=CENTER)
 
     def delete_button_pressed(self):
+        """Delete config button action"""
         if self.interactive_mode:
-            os.remove(os.path.join(CONFIGS, "interactive\\" + self.tk_var.get()))
+            os.remove(os.path.join(CONFIGS, "interactive\\" + self.selected_config.get()))
         else:
-            os.remove(os.path.join(CONFIGS, "automatic_testing\\" + self.tk_var.get()))
+            os.remove(os.path.join(CONFIGS, "automatic_testing\\" + self.selected_config.get()))
 
         self.update_dropdown_list()
-        self.tk_var.set('Select a config...')
+        self.selected_config.set('Select a config...')
 
     def dropdown_changed(self, selected=None):
-        if self.tk_var.get() in self.example_configs:
+        """Drop down menu behavior"""
+        if self.selected_config.get() in self.example_configs:
             self.edit_button.configure(bg="gray")
         else:
             self.edit_button.config(bg="white")
 
     def add_button_pressed(self):
+        """Add new config behavior"""
         NameInputBox(self)
         self.update_dropdown_list()
 
@@ -150,39 +157,44 @@ class InteractivePopup(Toplevel):
         menu.delete(0, "end")
         if self.interactive_mode:
             for name in os.listdir(os.path.join(CONFIGS, "interactive")):
-                menu.add_command(label=name, command=lambda value=name: self.tk_var.set(value))
+                menu.add_command(label=name, command=lambda value=name: self.selected_config.set(value))
                 # self.drop_down_menu.configure(command=self.dropdown_changed)
         else:
             for name in os.listdir(os.path.join(CONFIGS, "automatic_testing")):
-                menu.add_command(label=name, command=lambda value=name: self.tk_var.set(value))
+                menu.add_command(label=name, command=lambda value=name: self.selected_config.set(value))
 
     def ok_button_pressed(self):
-        if self.tk_var.get() in os.listdir(os.path.join(CONFIGS, "automatic_testing")) or \
-                self.tk_var.get() in os.listdir(os.path.join(CONFIGS, "interactive")):
+        """Ok button action"""
+        if self.selected_config.get() in os.listdir(os.path.join(CONFIGS, "automatic_testing")) or \
+                self.selected_config.get() in os.listdir(os.path.join(CONFIGS, "interactive")):
             if self.interactive_mode:
-                # os.system("..\\venv\\Scripts\\python.exe interactive.py ..\\configs\\interactive\\"+str(self.tk_var.get())+"& @pause")
-                # print(self.tk_var.get())
-                # interactive.InteractiveSimulator("configs/interactive/"+self.tk_var.get())
                 if platform.system() == 'Linux':
-                    subprocess.Popen(f"python {pkg_resources.resource_filename('evolutionsimulator', 'interactive.py')} {os.path.join(CONFIGS, 'interactive', self.tk_var.get())}", shell=True)
+                    subprocess.Popen(
+                        f"python {pkg_resources.resource_filename('evolutionsimulator', 'interactive.py')} {os.path.join(CONFIGS, 'interactive', self.selected_config.get())}",
+                        shell=True)
                 else:
-                    subprocess.Popen(f"python {pkg_resources.resource_filename('evolutionsimulator', 'interactive.py')} {os.path.join(CONFIGS, 'interactive', self.tk_var.get())}", creationflags=subprocess.CREATE_NEW_CONSOLE)
-                print(os.path.join(CONFIGS, 'interactive', self.tk_var.get()))
+                    subprocess.Popen(
+                        f"python {pkg_resources.resource_filename('evolutionsimulator', 'interactive.py')} {os.path.join(CONFIGS, 'interactive', self.selected_config.get())}",
+                        creationflags=subprocess.CREATE_NEW_CONSOLE)
+                print(os.path.join(CONFIGS, 'interactive', self.selected_config.get()))
             else:
                 if platform.system() == 'Linux':
-                    subprocess.Popen(f"python {pkg_resources.resource_filename('evolutionsimulator', 'automatic_testing.py')} {os.path.join(CONFIGS, 'automatic_testing', self.tk_var.get())}", shell=True)
+                    subprocess.Popen(
+                        f"python {pkg_resources.resource_filename('evolutionsimulator', 'automatic_testing.py')} {os.path.join(CONFIGS, 'automatic_testing', self.selected_config.get())}",
+                        shell=True)
                 else:
-                    subprocess.Popen(f"python {pkg_resources.resource_filename('evolutionsimulator', 'interactive.py')} {os.path.join(CONFIGS, 'interactive', self.tk_var.get())}", creationflags=subprocess.CREATE_NEW_CONSOLE)
-                # os.system("..\\venv\\Scripts\\python.exe automatic_testing.py ..\\configs\\automatic_testing\\" + str(
-                # self.tk_var.get()) + "& @pause")
+                    subprocess.Popen(
+                        f"python {pkg_resources.resource_filename('evolutionsimulator', 'interactive.py')} {os.path.join(CONFIGS, 'interactive', self.selected_config.get())}",
+                        creationflags=subprocess.CREATE_NEW_CONSOLE)
 
     def edit_button_pressed(self):
-        if self.tk_var.get() in self.example_configs:
+        """Edit button action"""
+        if self.selected_config.get() in self.example_configs:
             pass
         elif self.interactive_mode:
-            os.startfile(os.path.join(CONFIGS, 'interactive', self.tk_var.get()))
+            os.startfile(os.path.join(CONFIGS, 'interactive', self.selected_config.get()))
         else:
-            os.startfile(os.path.join(CONFIGS, 'automatic_testing', self.tk_var.get()))
+            os.startfile(os.path.join(CONFIGS, 'automatic_testing', self.selected_config.get()))
 
 
 class NameInputBox(Toplevel):
@@ -207,11 +219,11 @@ class NameInputBox(Toplevel):
     def ok_button_pressed(self, event=None):
         if self.master.interactive_mode:
             copyfile(os.path.join(CONFIGS, 'interactive', "mice_and_owls.ini"),
-                    os.path.join(CONFIGS, 'interactive', self.entry_widget.get(), ".ini"))
+                     os.path.join(CONFIGS, 'interactive', self.entry_widget.get(), ".ini"))
         else:
             copyfile(os.path.join(CONFIGS, 'automatic_testing', "mice_and_owls.ini"),
-                    os.path.join(CONFIGS, 'automatic_testing', self.entry_widget.get(), ".ini"))
-        self.master.tk_var.set(self.entry_widget.get() + ".ini")
+                     os.path.join(CONFIGS, 'automatic_testing', self.entry_widget.get(), ".ini"))
+        self.master.selected_config.set(self.entry_widget.get() + ".ini")
         self.destroy()
 
 

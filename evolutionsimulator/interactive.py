@@ -38,10 +38,10 @@ class InteractiveSimulator:
                 else:
                     self.env.step_and_print()
 
-            elif keyboard.is_pressed('Left'):
+            elif keyboard.is_pressed('left'):
                 self.slow_mode = True
 
-            elif keyboard.is_pressed('Right'):
+            elif keyboard.is_pressed('right'):
                 self.slow_mode = False
 
             elif keyboard.is_pressed('r'):
