@@ -1,5 +1,5 @@
 import pkg_resources
-import environment
+import evolutionsimulator.environment as environment
 import configparser
 import csv
 import re
@@ -150,8 +150,7 @@ class Tester:
                                         for o_value_number in self.config_dict['OWLS']['o_number']:
                                             self.config_parser.set("OWLS", "o_number", str(o_value_number))
 
-                                            for rand_variance_trait_value in self.config_dict['INHERITANCE'][
-                                                'rand_variance_trait']:
+                                            for rand_variance_trait_value in self.config_dict['INHERITANCE']['rand_variance_trait']:
                                                 self.config_parser.set("INHERITANCE", "rand_variance_trait",
                                                                        str(rand_variance_trait_value))
 
