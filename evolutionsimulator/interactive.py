@@ -1,12 +1,11 @@
 import pkg_resources
-import environment
+import evolutionsimulator.environment as environment
 import keyboard
 import time
 import cursor
 from os import system
 import configparser
 import sys
-
 
 ########################
 # CHOOSE A CONFIG FILE TO BE USED WHEN FILE RUN DIRECTLY:
