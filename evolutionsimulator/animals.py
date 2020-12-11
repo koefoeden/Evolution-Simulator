@@ -4,10 +4,12 @@ from termcolor import colored
 
 
 class Animal:
+    """An animal (either mouse or owl)"""
     sex_dict = {0: "male", 1: "female"}
     dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]
 
     def __init__(self, x_y: Tuple[int, int], parents: List, env):
+        """Initialize characteristics for animal"""
         self.position = x_y
         self.parents = parents
         self.env = env
@@ -107,6 +109,7 @@ class Animal:
 
 
 class Mouse(Animal):
+    """A mouse"""
     ID = 0
     sex_color_dict = {'male': "blue", 'female': 'cyan'}
 
@@ -166,6 +169,7 @@ class Mouse(Animal):
 
 
 class Owl(Animal):
+    """An owl"""
     ID = 0
     sex_color_dict = {'male': "red", 'female': 'yellow'}
 
