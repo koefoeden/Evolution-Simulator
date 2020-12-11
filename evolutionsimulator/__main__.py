@@ -4,10 +4,11 @@ from tkinter import *
 from tkinter import OptionMenu
 from tk_html_widgets import *
 # from src.interactive import  interactive
-from subprocess import Popen, CREATE_NEW_CONSOLE
+import subprocess
 from tkinterhtml import HtmlFrame
 import os
 from shutil import copyfile
+import platform
 
 RESORUCES = pkg_resources.resource_filename('evolutionsimulator', 'resources/')
 CONFIGS = pkg_resources.resource_filename('evolutionsimulator', 'configs/')
@@ -162,10 +163,16 @@ class InteractivePopup(Toplevel):
                 # os.system("..\\venv\\Scripts\\python.exe interactive.py ..\\configs\\interactive\\"+str(self.tk_var.get())+"& @pause")
                 # print(self.tk_var.get())
                 # interactive.InteractiveSimulator("configs/interactive/"+self.tk_var.get())
-                Popen(f"python {pkg_resources.resource_filename('evolutionsimulator', 'interactive.py')} {os.path.join(CONFIGS, 'interactive', self.tk_var.get())}", creationflags=CREATE_NEW_CONSOLE)
+                if platform.system() == 'Linux':
+                    subprocess.Popen(f"python {pkg_resources.resource_filename('evolutionsimulator', 'interactive.py')} {os.path.join(CONFIGS, 'interactive', self.tk_var.get())}", shell=True)
+                else:
+                    subprocess.Popen(f"python {pkg_resources.resource_filename('evolutionsimulator', 'interactive.py')} {os.path.join(CONFIGS, 'interactive', self.tk_var.get())}", creationflags=subprocess.CREATE_NEW_CONSOLE)
                 print(os.path.join(CONFIGS, 'interactive', self.tk_var.get()))
             else:
-                Popen(f"python {pkg_resources.resource_filename('evolutionsimulator', 'automatic_testing.py')} {os.path.join(CONFIGS, 'automatic_testing', self.tk_var.get())}", creationflags=CREATE_NEW_CONSOLE)
+                if platform.system() == 'Linux':
+                    subprocess.Popen(f"python {pkg_resources.resource_filename('evolutionsimulator', 'automatic_testing.py')} {os.path.join(CONFIGS, 'automatic_testing', self.tk_var.get())}", shell=True)
+                else:
+                    subprocess.Popen(f"python {pkg_resources.resource_filename('evolutionsimulator', 'interactive.py')} {os.path.join(CONFIGS, 'interactive', self.tk_var.get())}", creationflags=subprocess.CREATE_NEW_CONSOLE)
                 # os.system("..\\venv\\Scripts\\python.exe automatic_testing.py ..\\configs\\automatic_testing\\" + str(
                 # self.tk_var.get()) + "& @pause")
 
