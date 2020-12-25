@@ -1,3 +1,4 @@
+from __future__ import annotations
 import evolutionsimulator.animals as animals
 import copy
 from random import shuffle, randint
@@ -15,7 +16,7 @@ def clear_screen():
 
 
 class Tile:
-    def __init__(self, x: int, y: int, env):
+    def __init__(self, x: int, y: int, env: Environment):
         self.env = env
         self.position = (x, y)
         self.rock = False
@@ -63,7 +64,7 @@ class Environment:
         self.tick_no = 0
         self.step_no = 0
 
-        self.fields = [[Tile(x, y, self) for x in range(self.dimensions)] for y in range(self.dimensions)]
+        self.tiles = [[Tile(x, y, self) for x in range(self.dimensions)] for y in range(self.dimensions)]
         self.mice_alive = 0
         self.owls_alive = 0
 
@@ -77,7 +78,7 @@ class Environment:
 
         system(f'mode con: cols={console_width} lines={console_height}')
 
-    def add_animal_at(self, animal: str, tile, parents=None):
+    def add_animal_at(self, animal: str, tile: Tile, parents=None):
         if animal == "mouse":
             new_mouse = animals.Mouse(tile.position, parents, self)
             self.mice.append(new_mouse)
@@ -95,7 +96,7 @@ class Environment:
             self.owls_alive += 1
 
     def add_animals(self):
-        tile_list = [self.fields[y][x] for x in range(self.dimensions) for y in range(self.dimensions)]
+        tile_list = [self.tiles[y][x] for x in range(self.dimensions) for y in range(self.dimensions)]
         shuffle(tile_list)
 
         for i in range(self.start_mice):
@@ -105,7 +106,7 @@ class Environment:
             self.add_animal_at("owl", tile_list[i2])
 
     def add_grass_and_rocks(self):
-        for row in self.fields:
+        for row in self.tiles:
             for tile in row:
                 if not tile.animal:
                     rand_int = randint(1, 100)
@@ -122,7 +123,7 @@ class Environment:
         x, y = x_y
         return (0 <= x < self.dimensions) and (0 <= y < self.dimensions)
 
-    def animal_move_to(self, animal, dest_tile):
+    def animal_move_to(self, animal: animals.Animal, dest_tile: Tile):
         self.clear_field_of_animal(animal)
         animal.position = dest_tile.position
         dest_tile.animal = animal
@@ -132,9 +133,9 @@ class Environment:
                 dest_tile.time_since_grass_eaten = 0
                 animal.time_since_eaten = 0
 
-    def clear_field_of_animal(self, animal):
+    def clear_field_of_animal(self, animal: animals.Animal):
         x, y = animal.position
-        self.fields[y][x].animal = None
+        self.tiles[y][x].animal = None
 
     def owls_tick(self, step_mode=False):
         owls_copy = copy.copy(self.owls)
@@ -180,7 +181,7 @@ class Environment:
             owl.has_moved = False
 
     def grow_grass(self):
-        for row in self.fields:
+        for row in self.tiles:
             for tile in row:
                 if not tile.rock:
                     tile.time_since_grass_eaten += 1
@@ -241,7 +242,7 @@ class Environment:
         for i in range(self.dimensions):
             print("{:^{}}".format(i+1, self.field_size), end=' ')
         print()
-        for i, row in enumerate(self.fields):
+        for i, row in enumerate(self.tiles):
             print(" {:>2}".format(i+1), end=' ')
             for item in row:
                 print(str(item), end=' ')

@@ -8,7 +8,7 @@ class Animal:
     sex_dict = {0: "male", 1: "female"}
     dir_options = [(0, 1), (1, 0), (0, -1), (-1, 0), (0, 0)]
 
-    def __init__(self, x_y: Tuple[int, int], parents: List, env):
+    def __init__(self, x_y: Tuple[int, int], parents: List, env) -> None:
         """Initialize characteristics for animal"""
         self.position = x_y
         self.parents = parents
@@ -43,7 +43,7 @@ class Animal:
         else:
             self.speed = randint(1, 100)
 
-    def string_speed(self):
+    def string_speed(self) -> str:
         if self.env.field_size < 5:
             if len(str(self.speed)) > self.env.field_size:
                 self.env.field_size += 1
@@ -51,26 +51,26 @@ class Animal:
         else:
             return '{:.0e}'.format(self.speed)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.is_pregnant:
             return colored(self.string_speed(), self.color, attrs=['underline'])
         else:
             return colored(self.string_speed(), self.color)
 
-    def inherit_speed(self):
+    def inherit_speed(self) -> int:
         mean_parent_trait = (self.parents[0].speed+self.parents[1].speed)/2
         rand_variance_int = randint(-self.env.rand_variance_trait, self.env.rand_variance_trait)
         rand_trait_contribution = (mean_parent_trait/100)*rand_variance_int
 
         return max(int(mean_parent_trait + rand_trait_contribution), 1)
 
-    def is_natural_dead_action(self):
+    def is_natural_dead_action(self) -> bool:
         if (self.time_since_eaten == self.die_of_hunger and self.die_of_hunger != 0) or \
                 (self.age == self.max_age and self.max_age != 0):
             self.mark_as_dead()
             return True
 
-    def post_action(self):
+    def post_action(self) -> None:
         self.has_moved = True
         self.age += 1
         self.time_since_eaten += 1
@@ -79,7 +79,7 @@ class Animal:
         x_pos, y_pos = self.position
         adj_coordinates = [(x_pos+x_move, y_pos+y_move) for x_move, y_move in Animal.dir_options]
         adj_legal_coordinates = [coordinates for coordinates in adj_coordinates if self.env.is_legal_coordinates(coordinates)]
-        adj_legal_tiles = [self.env.fields[y][x] for (x, y) in adj_legal_coordinates if not self.env.fields[y][x].rock]
+        adj_legal_tiles = [self.env.tiles[y][x] for (x, y) in adj_legal_coordinates if not self.env.tiles[y][x].rock]
         shuffle(adj_legal_tiles)
         return adj_legal_tiles
 
@@ -113,18 +113,18 @@ class Mouse(Animal):
     ID = 0
     sex_color_dict = {'male': "blue", 'female': 'cyan'}
 
-    def __init__(self, x_y: Tuple[int, int], parents, env=None):
+    def __init__(self, x_y: Tuple[int, int], parents, env=None) -> None:
         super().__init__(x_y, parents, env)
         self.ID = Mouse.ID
         Mouse.ID += 1
         self.color = Mouse.sex_color_dict[self.sex]
 
-    def mark_as_dead(self):
+    def mark_as_dead(self) -> None:
         self.env.mice.remove(self)
         self.env.mice_alive -= 1
         self.env.clear_field_of_animal(self)
 
-    def owl_near_action(self, empty_tiles):
+    def owl_near_action(self, empty_tiles) -> bool:
         if self.get_owl_tiles() and empty_tiles:
             self.env.animal_move_to(self, empty_tiles[0])
             return True
