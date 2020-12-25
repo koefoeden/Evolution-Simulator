@@ -4,4 +4,4 @@ python:
 install:
   - pip install -r requirements.txt
 script:
-  - python -m unittest test_custom_cases.py
+  - python -m unittest discoverg
