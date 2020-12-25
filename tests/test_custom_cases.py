@@ -9,7 +9,7 @@ from evolutionsimulator import animals
 
 class CatchingMechanics(TestCase):
     def setUp(self) -> None:
-        # Set up an empty test-environment
+        # Set up an empty test-environment.
         self.config_parser = configparser.ConfigParser()
         self.cfg_file = 'complex_case_1.ini'
         self.config_parser.read(self.cfg_file)
