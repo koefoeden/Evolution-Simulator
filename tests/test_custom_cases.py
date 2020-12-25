@@ -2,9 +2,10 @@ import unittest
 from unittest import TestCase
 
 import evolutionsimulator.environment as environment
+import evolutionsimulator.animals as animals
 import configparser
 
-from evolutionsimulator import animals
+
 
 
 class CatchingMechanics(TestCase):
