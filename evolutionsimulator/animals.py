@@ -65,7 +65,11 @@ class Animal:
         return max(int(mean_parent_trait + rand_trait_contribution), 1)
 
     def is_natural_dead_action(self) -> bool:
+<<<<<<< HEAD:evolutionsimulator/animals.py
         if (self.time_since_eaten >= self.die_of_hunger and self.die_of_hunger != 0) or \
+=======
+        if (self.time_since_eaten == self.die_of_hunger and self.die_of_hunger != 0) or \
+>>>>>>> bb6ee8cdb2e37b0c2635493447ee65e6b9c19258:evolutionsimulator/src/animals.py
                 (self.age == self.max_age and self.max_age != 0):
             self.mark_as_dead()
             return True
