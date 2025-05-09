@@ -7,6 +7,12 @@ edition = "2021"
 
 [dependencies]
 rand = "*"
-rand_chacha = "0.3"
-chrono = "0.4"
-clap = { version = "4", features = ["derive"] }
+rand_chacha = "*"
+chrono = "*"
+clap = { version = "*", features = ["derive"] }
+serde = { version = "*", features = ["derive"]}
+toml = "*"
+
+[lib]
+name = "evolution_simulator"
+path = "src/lib.rs"
