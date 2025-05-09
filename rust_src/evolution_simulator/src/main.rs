@@ -1,4 +1,5 @@
-use rand::{rng, Rng};
+use rand::Rng;
+use std::collections::HashSet;
 
 pub struct AnimalData {
     pub id: String,
@@ -7,6 +8,12 @@ pub struct AnimalData {
     pub father: Option<String>,
     pub mother: Option<String>,
     pub location: (i32, i32),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Species {
+    Owl,
+    Mouse,
 }
 
 
@@ -35,7 +42,8 @@ pub trait Animal {
         let new_y = (y + dy).clamp(0, max_y);
         self.set_location((new_x, new_y));
     }
-    fn symbol(&self) -> String;
+    fn symbol(&self) -> &str;
+    fn species(&self) -> Species;
 }
 
 pub struct Owl {
@@ -49,13 +57,15 @@ pub struct Mouse {
 impl Animal for Owl {
     fn data(&self) -> &AnimalData { &self.data }
     fn data_mut(&mut self) -> &mut AnimalData { &mut self.data }
-    fn symbol(&self) -> String { format!("\x1b[31m{}\x1b[0m", 'O') }
+    fn symbol(&self) -> &str { "\x1b[31mO\x1b[0m" }
+    fn species(&self) -> Species { Species::Owl }
 }
 
 impl Animal for Mouse {
     fn data(&self) -> &AnimalData { &self.data }
     fn data_mut(&mut self) -> &mut AnimalData { &mut self.data }
-    fn symbol(&self) -> String { format!("\x1b[34m{}\x1b[0m", 'M') }
+    fn symbol(&self) -> &str { "\x1b[34mM\x1b[0m" }
+    fn species(&self) -> Species { Species::Mouse }
 }
 
 impl Owl {
@@ -91,20 +101,21 @@ impl Board {
         &self.animals
     }
     pub fn print(&self) {
-        for row in (0..=(self.height as usize)).rev() {
-            for col in 0..=(self.width as usize) {
-                let ch = self.animals
-                .iter()
-                .find_map(|a| {
-                    let (x, y) = a.location().unwrap();
-                    if (x as usize, y as usize) == (col, row) {
-                        Some(a.symbol())
-                    } else {
-                        None
+        for row in (0..=self.height as usize).rev() {
+            for col in 0..=self.width as usize {
+                let mut found = false;
+                for a in &self.animals {
+                    if let Some((x, y)) = a.location() {
+                        if (x as usize, y as usize) == (col, row) {
+                            print!("{}", a.symbol());
+                            found = true;
+                            break;
+                        }
                     }
-                })
-                .unwrap_or(".".to_string());
-                print!("{}", ch);
+                }
+                if !found {
+                    print!(".");
+                }
             }
             println!();
         }
@@ -118,18 +129,18 @@ fn main() {
     let n_ticks = 50;
     let sleep_time_sec = 0.1;
     
-    let mut rng = rng();
+    let mut rng = rand::thread_rng();
     // add random owls
     for i in 0..n_owls {
-        let x = rng.random_range(0..=board.width);
-        let y = rng.random_range(0..=board.height);
+        let x = rng.gen_range(0..=board.width);
+        let y = rng.gen_range(0..=board.height);
         let id = format!("Owl{}", i + 1);
         board.add_animal(Box::new(Owl::new(id, 0, 10, None, None, (x, y))));
     }
     // add random mice
     for i in 0..n_mice {
-        let x = rng.random_range(0..=board.width);
-        let y = rng.random_range(0..=board.height);
+        let x = rng.gen_range(0..=board.width);
+        let y = rng.gen_range(0..=board.height);
         let id = format!("Mouse{}", i + 1);
         board.add_animal(Box::new(Mouse::new(id, 0, 5, None, None, (x, y))));
     }
@@ -148,49 +159,49 @@ fn main() {
         let mouse_positions: Vec<(i32, i32)> = board
             .animals
             .iter()
-            .filter_map(|a| {
-                if a.id().starts_with("Mouse") {
-                    a.location()
-                } else {
-                    None
-                }
+            .filter_map(|a| match a.species() {
+                Species::Mouse => a.location(),
+                _ => None,
             })
             .collect();
 
         for animal in board.animals.iter_mut() {
-            if animal.id().starts_with("Owl") {
-                // find nearest mouse
-                if let (Some(&(mx, my)), Some((x, y))) = (
-                    mouse_positions.iter().min_by_key(|&&(mx, my)| {
-                        let (ax, ay) = animal.location().unwrap();
-                        (mx - ax).abs() + (my - ay).abs()
-                    }),
-                    animal.location(),
-                ) {
-                    let (ax, ay) = (x, y);
-                    let dx = (mx - ax).signum();
-                    let dy = (my - ay).signum();
+            match animal.species() {
+                Species::Owl => {
+                    // find nearest mouse
+                    if let (Some(&(mx, my)), Some((x, y))) = (
+                        mouse_positions.iter().min_by_key(|&&(mx, my)| {
+                            let (ax, ay) = animal.location().unwrap();
+                            (mx - ax).abs() + (my - ay).abs()
+                        }),
+                        animal.location(),
+                    ) {
+                        let (ax, ay) = (x, y);
+                        let dx = (mx - ax).signum();
+                        let dy = (my - ay).signum();
+                        animal.move_by(dx, dy, w, h);
+                    }
+                }
+                Species::Mouse => {
+                    // mouse: random move
+                    let dx = rng.gen_range(-1..=1);
+                    let dy = rng.gen_range(-1..=1);
                     animal.move_by(dx, dy, w, h);
                 }
-            } else {
-                // mouse: random move
-                let dx = rng.random_range(-1..=1);
-                let dy = rng.random_range(-1..=1);
-                animal.move_by(dx, dy, w, h);
             }
         }
         // remove any mice caught by owls
-        let owl_positions: Vec<(i32, i32)> = board.animals
+        let owl_positions: HashSet<(i32, i32)> = board.animals
             .iter()
-            .filter_map(|a| if a.id().starts_with("Owl") { a.location() } else { None })
+            .filter_map(|a| match a.species() {
+                Species::Owl => a.location(),
+                _ => None,
+            })
             .collect();
         board.animals.retain(|a| {
-            if a.id().starts_with("Mouse") {
-                if let Some(pos) = a.location() {
-                    !owl_positions.contains(&pos)
-                } else { true }
-            } else {
-                true
+            match a.species() {
+                Species::Mouse => a.location().map_or(true, |pos| !owl_positions.contains(&pos)),
+                _ => true,
             }
         });
     }
