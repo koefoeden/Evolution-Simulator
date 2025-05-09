@@ -1,12 +1,6 @@
 use clap::Parser;
-use rand::rng;
-use rand::Rng;
-use rand::seq::SliceRandom; // <-- change from rand::prelude::SliceRandom to rand::seq::SliceRandom
-use rand::prelude::IndexedRandom;
-use chrono::Local;
 use std::fs::OpenOptions;
 use std::io::Write;
-use std::time::Instant;
 
 
 mod animal;
@@ -15,9 +9,7 @@ mod controller;
 mod config;        // new
 mod simulation;    // new
 
-use crate::animal::{Owl, Mouse, Sex};
-use crate::board::{Board, Position};
-use crate::config::{load_config, SimulationConfig, BoardConfig, MiceConfig, OwlsConfig, Config};
+use crate::config::load_config;
 use crate::simulation::Simulation;
 use crate::controller::run_control_loop;
 

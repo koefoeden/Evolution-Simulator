@@ -46,13 +46,12 @@ impl Simulation {
         let chosen = &all_positions[..total];
         
         // spawn owls and mice
-        for (i, &pos) in chosen.iter().enumerate().take(config.owls.count as usize) {
-            let id = format!("Owl{}", i + 1);
+        for &pos in chosen.iter().take(config.owls.count as usize) {
             board.add_owl(Owl::new(pos));
         }
         for (j, &pos) in chosen.iter().enumerate().skip(config.owls.count as usize) {
             let id = format!("Mouse{}", j - config.owls.count as usize + 1);
-            let sex = if rng.gen_bool(0.5) { Sex::Male } else { Sex::Female };
+            let sex = if rng.random_bool(0.5) { Sex::Male } else { Sex::Female };
             board.add_mouse(Mouse::new(id, pos, sex));
         }
         board.init_grass();
