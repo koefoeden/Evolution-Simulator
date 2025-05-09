@@ -1,5 +1,7 @@
 use std::collections::HashSet;
 
+#[derive(Clone)]
+/// Core data for any animal
 pub struct AnimalData {
     pub id: String,
     pub age: u32,
@@ -42,10 +44,12 @@ pub trait Animal {
     fn species(&self) -> Species;
 }
 
+#[derive(Clone)]
 pub struct Owl {
     pub data: AnimalData,
 }
 
+#[derive(Clone)]
 pub struct Mouse {
     pub data: AnimalData,
 }
@@ -73,5 +77,40 @@ impl Owl {
 impl Mouse {
     pub fn new(id: String, age: u32, speed: u32, father: Option<String>, mother: Option<String>, location: (i32, i32)) -> Self {
         Mouse { data: AnimalData { id, age, speed, father, mother, location, ticks_since_last_eaten: 0 } }
+    }
+}
+
+// --- static dispatch wrapper ---
+/// Wrap an `Owl` or `Mouse` in a single enum to avoid `Box<dyn Animal>`
+#[derive(Clone)]
+pub enum Creature {
+    Owl(Owl),
+    Mouse(Mouse),
+}
+
+impl Animal for Creature {
+    fn data(&self) -> &AnimalData {
+        match self {
+            Creature::Owl(o) => o.data(),
+            Creature::Mouse(m) => m.data(),
+        }
+    }
+    fn data_mut(&mut self) -> &mut AnimalData {
+        match self {
+            Creature::Owl(o) => o.data_mut(),
+            Creature::Mouse(m) => m.data_mut(),
+        }
+    }
+    fn symbol(&self) -> &str {
+        match self {
+            Creature::Owl(o) => o.symbol(),
+            Creature::Mouse(m) => m.symbol(),
+        }
+    }
+    fn species(&self) -> Species {
+        match self {
+            Creature::Owl(_) => Species::Owl,
+            Creature::Mouse(_) => Species::Mouse,
+        }
     }
 }

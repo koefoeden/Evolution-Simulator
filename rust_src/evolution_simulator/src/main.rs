@@ -7,7 +7,7 @@ use std::io::Write;
 
 mod animal;
 mod board;
-use crate::animal::{Animal, Owl, Mouse, Species, AnimalData};
+use crate::animal::{Animal, Creature, Owl, Mouse, Species};
 use crate::board::{Board, Position};
 
 fn next_move(
@@ -105,12 +105,12 @@ fn main() {
     // spawn owls
     for (i, &pos) in chosen.iter().enumerate().take(N_OWLS as usize) {
         let id = format!("Owl{}", i + 1);
-        board.add_animal(Box::new(Owl::new(id, 0, 10, None, None, pos)));
+        board.add_animal(Creature::Owl(Owl::new(id, 0, 10, None, None, pos)));
     }
     // spawn mice
     for (j, &pos) in chosen.iter().enumerate().skip(N_OWLS as usize) {
         let id = format!("Mouse{}", j - N_OWLS as usize + 1);
-        board.add_animal(Box::new(Mouse::new(id, 0, 5, None, None, pos)));
+        board.add_animal(Creature::Mouse(Mouse::new(id, 0, 5, None, None, pos)));
     }
     // initialize grass after initial placement
     board.init_grass();
@@ -142,7 +142,7 @@ fn main() {
             .filter_map(|a| a.location())
             .collect();
         let moves: Vec<Option<Position>> = board.animals.iter().enumerate()
-            .map(|(idx, animal)| next_move(&**animal, idx, &board, &mouse_positions, &nonpreg, &mut rng))
+            .map(|(idx, animal)| next_move(animal, idx, &board, &mouse_positions, &nonpreg, &mut rng))
             .collect();
         board.apply_moves(moves);
         // Mice breeding: detect adjacency and register pregnancy
@@ -187,11 +187,11 @@ fn main() {
                      {
                          mouse_id_counter += 1;
                          let id = format!("Mouse{}", mouse_id_counter);
-                         board.add_animal(Box::new(Mouse::new(id, 0, 5, None, None, spawn)));
+                         board.add_animal(Creature::Mouse(Mouse::new(id, 0, 5, None, None, spawn)));
                      }
-                }
-            }
-        }
+                 }
+             }
+         }
         board.remove_caught_mice();
         // remove any mice that have starved (10+ ticks without eating)
         board.remove_starved_mice();

@@ -1,12 +1,12 @@
 use std::collections::HashSet;
-use crate::animal::{Animal, AnimalData, Species};
+use crate::animal::{Animal, Creature, Species};
 
 pub type Position = (i32, i32);
 
 pub struct Board {
     pub width: i32,
     pub height: i32,
-    pub animals: Vec<Box<dyn Animal>>,
+    pub animals: Vec<Creature>,
     pub grass: HashSet<Position>,
 }
 
@@ -27,8 +27,8 @@ impl Board {
         }
     }
 
-    pub fn add_animal(&mut self, a: Box<dyn Animal>) {
-        self.animals.push(a);
+    pub fn add_animal(&mut self, creature: Creature) {
+        self.animals.push(creature);
     }
 
     pub fn print(&self) {
