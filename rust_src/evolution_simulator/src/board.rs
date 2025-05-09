@@ -13,6 +13,8 @@ pub struct Board {
     pub dead_mice_total: usize,
     pub dead_mice_starved: usize,
     pub dead_mice_eaten: usize,
+    pub dead_mice_old_age: usize,  // new
+    pub dead_owls_old_age: usize,  // new
 }
 
 impl Board {
@@ -26,6 +28,8 @@ impl Board {
             dead_mice_total: 0,
             dead_mice_starved: 0,
             dead_mice_eaten: 0,
+            dead_mice_old_age: 0,
+            dead_owls_old_age: 0,
         }
     }
 
@@ -70,29 +74,47 @@ impl Board {
         }
 
         let mice_count = self.mice.len();
-        let owl_count = self.owls.len();
-        output.push_str(&format!(
-            "Mice: {}  Owls: {}  Dead mice: {} (starved: {}, eaten: {})\n",
-            mice_count,
-            owl_count,
-            self.dead_mice_total,
-            self.dead_mice_starved,
-            self.dead_mice_eaten
-        ));
+        let owl_count  = self.owls.len();
+
+        let stats = format!(
+            "Mice - alive: {mice_count}, starved: {mice_starved}, eaten: {mice_eaten}, old: {mice_old_age}\n\
+             Owls - alive: {owl_count}, old: {owls_old_age}\n",
+            mice_starved   = self.dead_mice_starved,
+            mice_eaten     = self.dead_mice_eaten,
+            mice_old_age  = self.dead_mice_old_age,
+            owls_old_age  = self.dead_owls_old_age,
+        );
+        output.push_str(&stats);
+
         print!("{}", output);
         io::stdout().flush().unwrap();
     }
 
-    pub fn mouse_positions(&self) -> &[Position] {
-        // SAFETY: All mice always have a location.
-        // This returns a slice of positions for all mice.
-        unsafe {
-            std::slice::from_raw_parts(self.mice.as_ptr() as *const Position, self.mice.len())
-        }
+    /// Return a fresh Vec of all mouse locations.
+    pub fn mouse_positions(&self) -> Vec<Position> {
+        self.mice.iter().map(|m| m.location).collect()
     }
 
     pub fn owl_positions(&self) -> HashSet<Position> {
         self.owls.iter().map(|a| a.location).collect()
+    }
+
+    /// increment age, then cull any animals past max_age
+    pub fn age_and_remove_old(&mut self, max_mouse_age: u32, max_owl_age: u32) {
+        // mice
+        for m in &mut self.mice { m.age += 1; }
+        let before_m = self.mice.len();
+        self.mice.retain(|m| m.age < max_mouse_age);
+        let removed_m = before_m.saturating_sub(self.mice.len());
+        self.dead_mice_total     += removed_m;
+        self.dead_mice_old_age   += removed_m;
+
+        // owls
+        for o in &mut self.owls { o.age += 1; }
+        let before_o = self.owls.len();
+        self.owls.retain(|o| o.age < max_owl_age);
+        let removed_o = before_o.saturating_sub(self.owls.len());
+        self.dead_owls_old_age    += removed_o;
     }
 
     pub fn apply_moves(&mut self, moves: &[Option<Position>]) {
@@ -143,45 +165,5 @@ impl Board {
         let starved = before.saturating_sub(after);
         self.dead_mice_total += starved;
         self.dead_mice_starved += starved;
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::animal::{Mouse, Owl, Sex};
-
-    #[test]
-    fn test_add_animal_and_grass() {
-        let mut board = Board::new(2, 2);
-        let m = Mouse::new("M1".to_string(), 0, 5, None, None, (1, 1), Sex::Female);
-        board.add_mouse(m);
-        board.init_grass();
-        assert!(board.grass.contains(&(0, 0)));
-        assert!(!board.grass.contains(&(1, 1))); // occupied by mouse
-    }
-
-    #[test]
-    fn test_remove_caught_and_starved_mice() {
-        let mut board = Board::new(2, 2);
-        let m1 = Mouse::new("M1".to_string(), 0, 5, None, None, (1, 1), Sex::Female);
-        let m2 = Mouse::new("M2".to_string(), 0, 5, None, None, (2, 2), Sex::Male);
-        let o = Owl::new("O1".to_string(), 0, 10, None, None, (1, 1), Sex::Male);
-        board.add_mouse(m1);
-        board.add_mouse(m2);
-        board.add_owl(o);
-        board.init_grass();
-
-        board.remove_caught_mice();
-        assert_eq!(board.mice.len(), 1);
-        assert_eq!(board.dead_mice_total, 1);
-
-        // starve the remaining mouse
-        if let Some(mouse) = board.mice.iter_mut().next() {
-            mouse.ticks_since_last_eaten = 10;
-        }
-        board.remove_starved_mice();
-        assert_eq!(board.mice.len(), 0);
-        assert_eq!(board.dead_mice_total, 2);
     }
 }

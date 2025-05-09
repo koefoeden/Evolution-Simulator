@@ -12,6 +12,7 @@ chrono = "*"
 clap = { version = "*", features = ["derive"] }
 serde = { version = "*", features = ["derive"]}
 toml = "*"
+crossterm = "0.23"
 
 [lib]
 name = "evolution_simulator"
