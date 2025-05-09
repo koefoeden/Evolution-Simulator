@@ -1,3 +1,4 @@
+use clap::Parser;
 use rand::rng;
 use rand::Rng;
 use rand::seq::SliceRandom; // <-- change from rand::prelude::SliceRandom to rand::seq::SliceRandom
@@ -10,26 +11,37 @@ use std::time::Instant;
 
 mod animal;
 mod board;
-mod controller;                      // new
+mod controller;
+mod config;        // new
+mod simulation;    // new
+
 use crate::animal::{Owl, Mouse, Sex};
 use crate::board::{Board, Position};
-use crate::config::{MiceConfig, OwlConfig, SimulationConfig, BoardConfig, Config, load_config};
-use crate::controller::run_control_loop;  // new
+use crate::config::{load_config, SimulationConfig, BoardConfig, MiceConfig, OwlsConfig, Config};
+use crate::simulation::Simulation;
+use crate::controller::run_control_loop;
 
-
+#[derive(Parser)]
+#[command(author, version, about)]
+struct Args {
+    #[arg(long)]
+    quiet: bool,
+    #[arg(long, default_value = "../config.toml")]
+    config: String,
+}
 
 fn main() {
     let args = Args::parse();
-    let config = load_config(&args.config);
-    let mut sim = Simulation::new(!args.quiet, config.clone());
-    
-    if config.simulation.enable_interactive {
-        run_control_loop(&mut sim);   // interactive stepping
+    let cfg = load_config(&args.config);
+    let mut sim = Simulation::new(!args.quiet, cfg.clone());
+
+    if cfg.simulation.enable_interactive {
+        run_control_loop(&mut sim);
     } else {
-        let (elapsed, ticks) = sim.run();  // batch run as before
-        println!("Simulation completed in {:?} after {} ticks", elapsed, ticks);
+        let (elapsed, ticks) = sim.run();
+        println!("Completed in {:?} after {} ticks", elapsed, ticks);
         // record performance summary
-        let perf_path = "simulation_performance.tsv";
+        let perf_path = "../simulation_performance.tsv";
         let mut perf_file = OpenOptions::new().create(true).append(true).open(perf_path).unwrap();
         if perf_file.metadata().unwrap().len() == 0 {
             writeln!(perf_file, "sim_id\tn_owls\tn_mice\tboard_width\tboard_height\tticks_elapsed\ttotal_time_s\tavg_tick_s").unwrap();

@@ -1,3 +1,8 @@
+use rand::prelude::IndexedRandom;
+use rand::rng;                      // for random fallback
+use crate::board::{Board, Position};
+use crate::config::MiceConfig;
+
 /// Sex of an animal.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Sex {
@@ -5,7 +10,6 @@ pub enum Sex {
     Female,
 }
 
-/// Mouse animal.
 #[derive(Clone)]
 pub struct Mouse {
     pub id: String,
@@ -15,14 +19,6 @@ pub struct Mouse {
     pub age: u32,
 }
 
-#[derive(Clone)]
-pub struct Owl {
-    pub id: String,
-    pub location: (i32, i32),
-    pub ticks_since_last_eaten: u32,
-    pub sex: Sex,
-    pub age: u32,
-}
 
 impl Mouse {
     pub fn new(id: String, location: (i32, i32), sex: Sex) -> Self {
@@ -37,7 +33,7 @@ impl Mouse {
 }
 
 /// Compute the next move for a mouse.
-fn next_mouse_move(
+pub fn next_mouse_move(
     idx: usize,
     board: &Board,
     mice_cfg: &MiceConfig,
@@ -121,7 +117,7 @@ fn next_mouse_move(
             (-1, 0), (1, 0), (0, -1), (0, 1),
             (-1, -1), (-1, 1), (1, -1), (1, 1),
             ];
-            let mut candidates: Vec<Position> = dirs
+            let candidates: Vec<Position> = dirs
             .iter()
             .map(|&(dx, dy)| (current_location.0 + dx, current_location.1 + dy))
             .filter(|&(x, y)| x >= 0 && x <= w && y >= 0 && y <= h)
@@ -175,20 +171,25 @@ fn next_mouse_move(
     }
 }
 
+#[derive(Clone)]
+pub struct Owl {
+    pub location: (i32, i32),
+    pub age: u32,
+}
+
 
 impl Owl {
-    pub fn new(id: String, location: (i32, i32), sex: Sex) -> Self {
-        Owl { id, location, ticks_since_last_eaten: 0, sex, age: 0 }
+    pub fn new(location: (i32, i32)) -> Self {
+        Owl {location, age: 0 }
     }
     pub fn symbol(&self) -> &str {
         "\x1b[31mO\x1b[0m"
     }
 }
 
-
 /// Compute the next move for an owl.
 /// If the direct path is blocked by another owl, try a random adjacent unoccupied tile.
-fn next_owl_move(
+pub fn next_owl_move(
     idx: usize,
     board: &Board,
     all_mice: &[Position],

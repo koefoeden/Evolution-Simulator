@@ -1,0 +1,20 @@
+[simulation]
+report_interval = 10
+n_ticks = 10000
+sleep_time = 0.5
+enable_interactive = false    # new: toggle interactive controller
+
+[board]
+width = 70
+height = 15
+
+[mice]
+count = 30
+preg_time = 10
+vision = 5
+hunger_priority = 5    # new: if ticks_since_last_eaten > this, mouse seeks grass first
+max_age = 100    # new
+
+[owls]
+count = 10
+max_age = 200    # new
