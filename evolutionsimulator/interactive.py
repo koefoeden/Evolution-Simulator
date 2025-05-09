@@ -1,5 +1,5 @@
 import pkg_resources
-import evolutionsimulator.environment as environment
+import environment as environment
 import keyboard
 import time
 import cursor
